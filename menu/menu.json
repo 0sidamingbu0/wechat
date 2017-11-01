@@ -1,0 +1,17 @@
+{
+	{
+          "type": "view",
+          "name": "设备管理",
+          "url": "http://123.207.144.78/device/"
+        },
+	{
+          "type": "view",
+          "name": "场景管理",
+          "url": "http://123.207.144.78/polic/"
+        },
+	{
+          "type": "view",
+          "name": "账户管理",
+          "url": "http://123.207.144.78/user/"
+        }
+}

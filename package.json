@@ -1,0 +1,31 @@
+{
+  "name": "wechat",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "cookie-parser": "^1.4.3",
+    "debug": "^3.1.0",
+    "express": "^4.16.2",
+    "express-session": "^1.15.6",
+    "is": "^3.2.1",
+    "jade": "^1.11.0",
+    "mongoose": "^4.12.4",
+    "morgan": "^1.9.0",
+    "mqtt": "^2.13.0",
+    "node-weixin-menu": "^0.6.0",
+    "redis": "^2.8.0",
+    "sha1": "^1.1.1",
+    "static-favicon": "^2.0.0-alpha",
+    "util": "^0.10.3",
+    "uuid": "^3.1.0",
+    "wechat": "^2.1.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "idol",
+  "license": "ISC"
+}

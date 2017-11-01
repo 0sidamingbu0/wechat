@@ -1,0 +1,10 @@
+
+{
+	"wechat" : {
+		"appID": "wx6debf35e8f567884",
+		"appSecret": "04976556b89bbffefe738f5ee068e72f",
+		"token": "idol",
+		"prefix": "https://api.weixin.qq.com/cgi-bin/",
+		"mpPrefix": "https://mp.weixin.qq.com/cgi-bin/"
+	}
+}

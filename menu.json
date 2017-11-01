@@ -1,0 +1,34 @@
+{
+    "button": [
+        {
+            "type": "click", 
+            "name": "设备管理", 
+            "key": "device"
+        }, 
+        {
+            "type": "click", 
+            "name": "场景管理", 
+            "key": "polic"
+        }, 
+        {
+            "name": "菜单", 
+            "sub_button": [
+                {
+                    "type": "view", 
+                    "name": "高级", 
+                    "url": "http://yulurobot.cn/weixin/"
+                }, 
+                {
+                    "type": "click", 
+                    "name": "网关管理", 
+                    "key": "gateway"
+                }, 
+                {
+                    "type": "click", 
+                    "name": "用户信息", 
+                    "key": "user"
+                }
+            ]
+        }
+    ]
+}
