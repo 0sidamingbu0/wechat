@@ -1,5 +1,5 @@
 var wechat = require('./routes/wechat');
-
+//var gatewayService = require('./routes/gatewayService');
 var express = require('express');
 var path = require('path');
 var favicon = require('static-favicon');
@@ -14,7 +14,7 @@ var routes = require('./routes/index');
 var users = require('./routes/users');
 
 var app = express();
-var mq = require('./mq');  
+var mq = require('./mqtt/mq');  
 var UserEntity = require('./models/user').UserEntity; 
 mq = mq();
 
@@ -38,6 +38,7 @@ app.use(session({
 
 
 //app.use(utils.sign(config));
+//app.use('/api', gatewayService);
 app.use('/', wechat);
 /// catch 404 and forwarding to error handler
 

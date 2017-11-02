@@ -29,42 +29,11 @@
       <label>
         设备管理
       </label>
+      <p ng-if="!device.length" align:center>您还没有设备哦</p> <!--没有笔记时显示-->
       <ul class="list-group">
-        <li class="list-group-item">
+        <li class="list-group-item" ng-repeat="x in device">
           <div>
-            客厅灯
-            <div>
-              <br>
-            </div>
-          </div>
-          <div>
-          </div>
-          <a href="#" class="btn btn-danger">关闭</a>
-          <span class="badge">关</span>
-          &nbsp;&nbsp;
-          <a href="#" class="btn btn-success">打开</a>
-          &nbsp;&nbsp;
-          <a href="screen-0665b1a04c.html" class="btn btn-info">详情</a>
-        </li>
-        <li class="list-group-item">
-          <div>
-            厨房灯
-            <div>
-              <br>
-            </div>
-          </div>
-          <div>
-          </div>
-          <a href="#" class="btn btn-danger">关闭</a>
-          <span class="badge">关</span>
-          &nbsp;&nbsp;
-          <a href="#" class="btn btn-success">打开</a>
-          &nbsp;&nbsp;
-          <a href="deviceinfo.html" class="btn btn-info">详情</a>
-        </li>
-        <li class="list-group-item">
-          <div>
-            插座
+            {{x.name}}
             <div>
               <br>
             </div>
@@ -92,8 +61,20 @@ app.controller('siteCtrl', function($scope, $http, $location) {
                 method: 'GET',
                 url: '/getid/' + $location.hash()
         }).then(function successCallback(response) {
-                        $scope.name = response.data;
+                        $scope.name = response.data.name;
                         console.log(response);
+                }, function errorCallback(response) {
+                        console.log('get err');
+                        // 请求失败执行代码
+        });
+
+	$http({
+                method: 'GET',
+                url: '/getdevicebyuser/'+ $location.hash().split('?',1)
+        }).then(function successCallback(response) {
+		//= JSON.parse(response);
+	                 $scope.device = response.data;
+			 console.log(response);
                 }, function errorCallback(response) {
                         console.log('get err');
                         // 请求失败执行代码

@@ -11,6 +11,7 @@ var config = {
 var session = require('express-session');
 var cookieParser = require('cookie-parser');
 var UserEntity = require('../models/user').UserEntity;
+var GateEntity = require('../models/gateway').GateEntity;
 
 //router.use(express.query());
 
@@ -47,6 +48,59 @@ router.use('/setid/',function(req,res){
                         console.log("update result:" + req.body.uid +  result)
                         res.send(result);
         });
+
+
+});
+
+router.use('/getdevicebyuser/:uid',function(req,res){
+        UserEntity.find({uid:req.params.uid},{gateway:1,'_id':0},function(err, result){ //findOne({uid:req.params.uid},function(err,user){
+                 if(err){//查询异常
+                        console.log("getdevice server error")
+                        res.send("server err");
+                 return;
+                }
+		try{
+		var gatelist = result[0].gateway;
+		console.log(gatelist);	
+                console.log("getdevice result:"  +req.params.uid + result)
+                GateEntity.find({mac:{'$in':gatelist}},{'_id':0,'device':1},function(err, device){ //findOne({uid:req.params.uid},function(err,user){
+                 if(err){//查询异常
+                        console.log("getdevice server error")
+                        res.send("server err");
+                 return;
+                }
+			var temp=new Array();;
+			for(var i=0 ;i<device.length ;i++){
+				for(var j =0;j<device[i].device.length;j++){
+					temp.push(device[i].device[j]);
+				}
+					
+			}
+			console.log(temp);
+        		res.send(temp);
+//			devicelist = device;
+		});
+//        	res.send(devicelist);
+		}catch(err){
+			res.send(err);
+		}
+        });
+
+
+});
+
+router.use('/getdevicebygateway/:mac',function(req,res){
+                GateEntity.find({mac:req.params.mac},{'_id':0,'device':1},function(err, device){ //findOne({uid:req.params.uid},function(err,user){
+                 if(err){//查询异常
+                        console.log("getdevice server error")
+                        res.send("server err");
+                 return;
+                }
+                        console.log(device);
+                        res.send(device);
+//                      devicelist = device;
+                });
+//              res.send(devicelist);
 
 
 });
