@@ -76,7 +76,7 @@ app.controller('siteCtrl', function($scope, $http, $location) {
         console.log('hash:'+$location.hash());
         $http({
                 method: 'GET',
-                url: '/getid/' + $location.hash()
+                url: '/getuserbyuid/' + $location.hash()
         }).then(function successCallback(response) {
                         $scope.name = response.data.name;
                         $scope.mobile = response.data.mobile;
@@ -95,7 +95,7 @@ app.controller('siteCtrl', function($scope, $http, $location) {
             	console.log($scope.name);
 		$http({
                 method: 'POST',
-                url: '/setid/',
+                url: '/setuserbyuid/',
 		data:{uid:$location.hash().split('?',1),name:$scope.name,mobile:$scope.mobile,password:$scope.password,email:$scope.email}
        		 }).then(function successCallback(response) {
                 	console.log(response);

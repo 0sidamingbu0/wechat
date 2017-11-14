@@ -1,0 +1,83 @@
+getid/uid
+GET
+return:
+{"_id":"59f940784b0242ad7bb31c34","uid":"oZWQZwz6-YeMqo8-3OOrL3JgdXMg","name":"","password":"123","mobile":"123","email":"123","__v":0,"otheruid":[],"gateway":["b8:02","b8:03"],"createTime":"2017-11-02T05:35:39.211Z","lastLoginTime":"2017-11-02T05:35:39.211Z"}
+根据uid查询user的信息
+
+setid
+POST
+body:
+{
+	uid:uid,
+	name:name,
+	password:pass,
+	mobile:mobile,
+	email:email
+}
+return:
+
+根据uid设置user内容
+
+getdevicebyuser/uid
+GET
+return:
+
+[ { name: '未命名',
+    mac: '00:12:05',
+    online: true,
+    type: 'button2',
+    creatTime: Thu Nov 02 2017 10:46:14 GMT+0800 (CST),
+    _id: 59fa86f6d50d242fa15d0be2 },
+  { name: '未命名',
+    mac: '00:12:01',
+    online: true,
+    type: 'button2',
+    creatTime: Thu Nov 02 2017 10:44:35 GMT+0800 (CST),
+    _id: 59fa869355371a2df0e03c17 },
+  { name: '未命名',
+    mac: '00:12:02',
+    online: true,
+    type: 'button2',
+    creatTime: Thu Nov 02 2017 10:44:42 GMT+0800 (CST),
+    _id: 59fa869a55371a2df0e03c18 },
+  { name: '未命名',
+    mac: '00:12:03',
+    online: true,
+    type: 'button2',
+    creatTime: Thu Nov 02 2017 10:44:45 GMT+0800 (CST),
+    _id: 59fa869d55371a2df0e03c19 },
+  { name: '未命名',
+    mac: '00:12:04',
+    online: true,
+    type: 'button2',
+    creatTime: Thu Nov 02 2017 10:44:47 GMT+0800 (CST),
+    _id: 59fa869f55371a2df0e03c1a },
+  { name: '客厅1',
+    lastTime: Thu Nov 02 2017 12:40:31 GMT+0800 (CST),
+    addr: 11,
+    mac: '00:13:01',
+    online: true,
+    type: 'button2',
+    creatTime: Thu Nov 02 2017 12:34:44 GMT+0800 (CST),
+    _id: 59faa064f6effe415f8ba9ee } ]
+
+
+getdevicebygateway/mac
+return:like getdevicebyuser
+
+joinbymac
+body:
+{mac:mac}
+
+sendbymac
+body:
+{
+   mac:mac,
+   do:sth//on,off,reverse
+   num:int//eg:light
+}
+
+removedevicebymac
+body:
+{mac:mac}
+

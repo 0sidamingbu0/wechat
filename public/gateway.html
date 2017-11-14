@@ -24,6 +24,72 @@
     <script src="/bootstrap.min.js"
     >
     </script>
+
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="myModalLabel">添加网关</h4>
+            </div>
+              <div class="modal-body">
+	        <input type="text" class="form-control"  placeholder="请输入网关标识码" ng-model="addmac">
+              <p></p>
+	        <input type="text" class="form-control"  placeholder="请输入网关别名" ng-model="addname">
+	    </div>
+            <div class="modal-footer">
+		<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary" ng-click = "add()">添加</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+</div>
+
+
+<div class="modal fade" id="myModaladddevice" tabindex="-1" role="dialog" aria-labelledby="myModalLabeladddevice" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="myModalLabeladddevice">添加设备</h4>
+            </div>
+              <div class="modal-body">
+        <p ng-if="!unregdevice.length" align:center>还没有设备加入哦~</p> <!--没有笔记时显示-->
+        <ul class="list-group">
+          <li class="list-group-item" ng-repeat="y in unregdevice">
+            <div>
+              <div class="text-left">
+                <input type="text" class="form-control" placeholder="请输入设备别名" ng-model="y.name">
+              </div>
+              <div class="text-left">
+                {{y.mac}}
+              </div>
+              <div class="text-left">
+                设备类型：{{y.type}}
+              </div>
+              <div class="text-left">
+		<button class="btn btn-success btn-xs" ng-click="savedevice(y)">注册</button>
+		<button class="btn btn-danger btn-xs" ng-click="deldevice(y)">删除</button>
+              </div>
+
+            </div>
+            <div>
+            </div>
+            <div>
+              <br>
+            </div>
+          </li>
+        </ul>
+            
+	      </div>
+            <div class="modal-footer">
+		<button type="button" class="btn btn-primary" ng-click = "join(lastgateway)">允许添加</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+</div>
+
     <div class="container text-center">
       <span class="label label-default"></span>
       <label class="pull-left">
@@ -31,42 +97,18 @@
       </label>
       <div>
         <b><br></b>
+	<p ng-if="!device.length" align:center>您还没有添加网关哦</p> <!--没有笔记时显示-->
         <ul class="list-group">
-          <li class="list-group-item">
+          <li class="list-group-item" ng-repeat="x in device">
             <div>
               <div class="text-left">
-                <input type="text" class="form-control" name="" id="">
+                <input type="text" class="form-control" ng-model="x.name">
               </div>
               <div class="text-left">
-                B8:27:88:88:88:12
+                {{x.mac}}
               </div>
               <div class="text-left">
-                注册时间：2017.6.4
-              </div>
-            </div>
-            <div>
-            </div>
-            <div>
-              <br>
-            </div>
-            <a href="#" class="btn btn-success btn-xs">添加设备</a>
-            &nbsp;
-            <a href="gatewaydevice.html" class="btn btn-primary btn-xs">子设备</a>
-            &nbsp;
-            <a href="#" class="btn btn-xs btn-default">修改别名</a>
-            &nbsp;
-            <a href="#" class="btn btn-danger btn-xs">删除</a>
-          </li>
-          <li class="list-group-item">
-            <div>
-              <div class="text-left">
-                <input type="text" class="form-control" name="" id="">
-              </div>
-              <div class="text-left">
-                B8:27:88:88:88:12
-              </div>
-              <div class="text-left">
-                注册时间：2017.6.4
+                注册时间：{{x.createTime}}
               </div>
             </div>
             <div>
@@ -74,37 +116,166 @@
             <div>
               <br>
             </div>
-            <a href="#" class="btn btn-success btn-xs">添加设备</a>
+            <button data-toggle="modal" data-target="#myModaladddevice" class="btn btn-success btn-xs" ng-click="adddevice(x)">添加设备</button>
             &nbsp;
-            <a href="screen-86e7744b49.html" class="btn btn-primary btn-xs">子设备</a>
+           <a class="btn btn-success btn-xs"  href="gatewaydevice.html#{{x.mac}}" >子设备</a>
             &nbsp;
-            <a href="#" class="btn btn-xs btn-default">修改别名</a>
+             <a class="btn btn-info btn-xs" ng-click="save(x)">修改别名</a>
             &nbsp;
-            <a href="#" class="btn btn-danger btn-xs">删除</a>
+            <button class="btn btn-danger btn-xs" ng-click="del(x)">删除</button>
           </li>
         </ul>
-        <a href="#" class="btn btn-default">添加网关</a>
+        <button data-toggle="modal" data-target="#myModal" class="btn btn-default">添加网关</button>
         <div class="form-group">
         </div>
       </div>
     </div>
     <hr>
 <script>
+
 var app = angular.module('myApp', []);
 
-app.controller('siteCtrl', function($scope, $http, $location) {
+app.controller('siteCtrl', function($scope, $http, $location,$window,$timeout,$interval) {
+	var lastgateway;
+	var timer;
         console.log($location);
         console.log('hash:'+$location.hash());
-        $http({
+	$http({
                 method: 'GET',
-                url: '/getid/' + $location.hash()
+                url: '/getuserbyuid/' + $location.hash()
         }).then(function successCallback(response) {
-                        $scope.name = response.data;
+                        $scope.name = response.data.name;
                         console.log(response);
                 }, function errorCallback(response) {
                         console.log('get err');
                         // 请求失败执行代码
         });
+	$http({
+                method: 'GET',
+                url: '/getgatewaybyuser/'+ $location.hash().split('?',1)
+        }).then(function successCallback(response) {
+                //= JSON.parse(response);
+                         $scope.device = response.data;
+                         console.log(response);
+                }, function errorCallback(response) {
+                        console.log('get err');
+                        // 请求失败执行代码
+        });
+        $scope.savedevice = function(y){
+		$http({
+                method: 'POST',
+                url: '/setdevicebymac/',
+                data:{'mac':y.mac,'name':y.name}
+                 }).then(function successCallback(response) {
+                        console.log(response);
+                        }, function errorCallback(response) {
+                        console.log('setdevicebymac return err');
+                        // 请求失败执行代码
+
+                        });
+		$timeout(function(){
+			getdevice(lastgateway);
+			},500);
+         };
+
+	$scope.save = function(y){
+        console.log(y);
+                $http({
+                method: 'POST',
+                url: '/setgatewaybymac/',
+                data:{'mac':y.mac,'name':y.name}
+                 }).then(function successCallback(response) {
+                        console.log(response);
+                        }, function errorCallback(response) {
+                        console.log('setgatewaybymac return err');
+                        // 请求失败执行代码
+
+                        });
+
+        };
+
+	$scope.add = function(){
+                $http({
+                method: 'POST',
+                url: '/addgatewaybyuid/',
+                data:{'mac':$scope.addmac,'name':$scope.addname,'uid':$location.hash().split('?',1)}
+                 }).then(function successCallback(response) {
+                        console.log(response);
+			if(response.data == 'ok'){
+				$('#myModal').modal('hide');
+				$window.location.reload();
+			}else{
+				 $scope.addmac = '设备添加失败';	
+			}
+                        }, function errorCallback(response) {
+                        console.log('setgatewaybymac return err');				
+                        // 请求失败执行代码
+				$scope.addmac = '设备添加失败';
+
+                        });
+
+        };
+
+
+	$scope.del = function(x){
+                $http({
+                method: 'POST',
+                url: '/removegatewaybyuid/',
+                data:{'mac':x.mac,'uid':$location.hash().split('?',1)}
+                 }).then(function successCallback(response) {
+                        console.log(response);
+			$window.location.reload();
+                        }, function errorCallback(response) {
+                        console.log('setgatewaybymac return err');
+                        // 请求失败执行代码
+
+                        });
+
+         };
+
+	$scope.adddevice = function(x){
+		lastgateway = x;
+		getdevice(x);
+                $http({
+                method: 'POST',
+                url: '/joinbymac/',
+                data:{'mac':x.mac}
+                 }).then(function successCallback(response) {
+                        console.log(response);
+                        }, function errorCallback(response) {
+                        console.log('joinbymac return err');
+                        // 请求失败执行代码
+
+                        });
+		timer=$interval(function(){
+			getdevice(lastgateway);
+		},1000); 
+         };
+	
+	$scope.$on('destroy',function(){
+   		$interval.cancel(timer);
+	})  //在控制器里，添加$on函数
+
+	$('#myModaladddevice').on('hidden.bs.modal', function () {
+ 		console.log('hidden');
+		$interval.cancel(timer);// 执行一些动作...
+	})
+
+        var getdevice = function(x){
+        $http({
+		 method: 'POST',
+                data:{'mac':x.mac},
+                url: '/getunregdevicebygateway/'
+        }).then(function successCallback(response) {
+                //= JSON.parse(response);
+                         $scope.unregdevice = response.data;
+                         console.log(response);
+                }, function errorCallback(response) {
+                         $scope.unregdivice = null;
+			 console.log('get err');
+                        // 请求失败执行代码
+        });
+        }
 
 });
 </script>

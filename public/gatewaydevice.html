@@ -27,56 +27,25 @@
     <div class="container">
       <span class="label label-default"></span>
       <label>
-        网关：B8:27:98:99:88:99 - 设备列表&nbsp; &nbsp;
+        设备管理
       </label>
+      <p ng-if="!device.length" align:center>您还没有设备哦</p> <!--没有笔记时显示-->
       <ul class="list-group">
-        <li class="list-group-item">
+        <li class="list-group-item" ng-repeat="x in device">
           <div>
-            客厅灯
+            {{x.name}}
             <div>
               <br>
             </div>
           </div>
           <div>
           </div>
-          <a href="#" class="btn btn-danger">关闭</a>
-          <span class="badge">关</span>
+          <button type="submit" class="btn btn-danger" ng-click="close(x)">关闭</button>
+          <span class="badge">{{x.status}}</span>
           &nbsp;&nbsp;
-          <a href="#" class="btn btn-success">打开</a>
-          &nbsp;&nbsp;
-          <a href="deviceinfo.html" class="btn btn-info">详情</a>
-        </li>
-        <li class="list-group-item">
-          <div>
-            厨房灯
-            <div>
-              <br>
-            </div>
-          </div>
-          <div>
-          </div>
-          <a href="#" class="btn btn-danger">关闭</a>
-          <span class="badge">关</span>
-          &nbsp;&nbsp;
-          <a href="#" class="btn btn-success">打开</a>
-          &nbsp;&nbsp;
-          <a href="screen-0665b1a04c.html" class="btn btn-info">详情</a>
-        </li>
-        <li class="list-group-item">
-          <div>
-            插座
-            <div>
-              <br>
-            </div>
-          </div>
-          <div>
-          </div>
-          <a href="#" class="btn btn-danger">关闭</a>
-          <span class="badge">关</span>
-          &nbsp;&nbsp;
-          <a href="#" class="btn btn-success">打开</a>
-          &nbsp;&nbsp;
-          <a href="screen-0665b1a04c.html" class="btn btn-info">详情</a>
+          <button type="submit"  class="btn btn-success" ng-click="open(x)">打开</button>
+       	  &nbsp;&nbsp;
+          <a href="deviceinfo.html#{{x.mac}}" class="btn btn-info">详情</a>
         </li>
       </ul>
       <div class="form-group">
@@ -90,14 +59,62 @@ app.controller('siteCtrl', function($scope, $http, $location) {
         console.log('hash:'+$location.hash());
         $http({
                 method: 'GET',
-                url: '/getid/' + $location.hash()
+                url: '/getuserbygateway/' + $location.hash()
         }).then(function successCallback(response) {
-                        $scope.name = response.data;
+                        $scope.name = response.data.name;
                         console.log(response);
                 }, function errorCallback(response) {
                         console.log('get err');
                         // 请求失败执行代码
         });
+	var getdevice = function(){
+	$http({
+                method: 'GET',
+                url: '/getdevicebygateway/'+ $location.hash().split('?',1)
+        }).then(function successCallback(response) {
+		//= JSON.parse(response);
+	                 $scope.device = response.data;
+			 console.log(response);
+                }, function errorCallback(response) {
+                        console.log('get err');
+                        // 请求失败执行代码
+        });
+	}
+        getdevice();
+
+        $scope.open = function(x){
+                console.log(x.mac);
+                $http({
+                method: 'POST',
+                url: '/sendbymac/',
+                data:{mac:x.mac,do:'on',num:'1'}
+                 }).then(function successCallback(response) {
+                        getdevice();
+                        console.log(response);
+                        }, function errorCallback(response) {
+                        console.log('get err');
+                        // 请求失败执行代码
+                        }
+                );
+
+        };
+
+        $scope.close = function(x){
+                console.log(x.mac);
+                $http({
+                method: 'POST',
+                url: '/sendbymac/',
+                data:{mac:x.mac,do:'off',num:'1'}
+                 }).then(function successCallback(response) {
+                        getdevice();
+                        console.log(response);
+                        }, function errorCallback(response) {
+                        console.log('get err');
+                        // 请求失败执行代码
+                        }
+                );
+	}
+
 
 });
 </script>

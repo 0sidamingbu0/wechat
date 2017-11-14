@@ -40,12 +40,12 @@
           </div>
           <div>
           </div>
-          <a href="#" class="btn btn-danger">关闭</a>
-          <span class="badge">关</span>
+          <button type="submit" class="btn btn-danger" ng-click="close(x)">关闭</button>
+          <span class="badge">{{x.status}}</span>
           &nbsp;&nbsp;
-          <a href="#" class="btn btn-success">打开</a>
+          <button type="submit"  class="btn btn-success" ng-click="open(x)">打开</button>
           &nbsp;&nbsp;
-          <a href="screen-0665b1a04c.html" class="btn btn-info">详情</a>
+          <a  href="deviceinfo.html#{{x.mac}}" class="btn btn-info">详情</a>
         </li>
       </ul>
       <div class="form-group">
@@ -54,12 +54,13 @@
 <script>
 var app = angular.module('myApp', []);
 
-app.controller('siteCtrl', function($scope, $http, $location) {
+app.controller('siteCtrl', function($scope, $http, $location,$window) {
+//	$scope.$on('locationChangeSuccess', $window.location.reload());
         console.log($location);
         console.log('hash:'+$location.hash());
         $http({
                 method: 'GET',
-                url: '/getid/' + $location.hash()
+                url: '/getuserbyuid/' + $location.hash()
         }).then(function successCallback(response) {
                         $scope.name = response.data.name;
                         console.log(response);
@@ -68,6 +69,7 @@ app.controller('siteCtrl', function($scope, $http, $location) {
                         // 请求失败执行代码
         });
 
+	var getdevice = function(){
 	$http({
                 method: 'GET',
                 url: '/getdevicebyuser/'+ $location.hash().split('?',1)
@@ -79,6 +81,43 @@ app.controller('siteCtrl', function($scope, $http, $location) {
                         console.log('get err');
                         // 请求失败执行代码
         });
+	}
+	getdevice();	
+
+        $scope.open = function(x){
+                console.log(x.mac);
+                $http({
+                method: 'POST',
+                url: '/sendbymac/',
+                data:{mac:x.mac,do:'on',num:'1'}
+                 }).then(function successCallback(response) {
+	                getdevice();
+			console.log(response);
+                        }, function errorCallback(response) {
+                        console.log('get err');
+                        // 请求失败执行代码
+                        }
+                );
+
+        };
+
+        $scope.close = function(x){
+                console.log(x.mac);
+                $http({
+                method: 'POST',
+                url: '/sendbymac/',
+                data:{mac:x.mac,do:'off',num:'1'}
+                 }).then(function successCallback(response) {
+                        getdevice();
+                        console.log(response);
+                        }, function errorCallback(response) {
+                        console.log('get err');
+                        // 请求失败执行代码
+                        }
+                );
+
+        };
+
 
 });
 </script>

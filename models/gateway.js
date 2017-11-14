@@ -4,16 +4,17 @@ var GateScheme =new base.Schema({
     	name:{type:String,default:'未命名'},
 	mac:String,
     	createTime:{type:Date,default:Date.now},//创建时间  
-  	device:[{
+  	lastTime:Date,
+	device:[{
 		mac:{type:String},
 		type:{type:String},
-		creatTime:{type:Date},
+		creatTime:{type:Date,default:Date.now},
 		lastTime:{type:Date},
 		addr:{type:Number},
 		online:{type:Boolean},
 		status:{type:String},
-		name:{type:String,default:'未命名'}
-		
+		name:{type:String,default:'未命名'},
+		registered:{type:Boolean,default:false}
 	}],
  	online:Boolean,
 	ip:String,

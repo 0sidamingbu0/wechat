@@ -1,0 +1,6 @@
+topic:device/upline
+msg:
+{"gmac":"b8:02","mac":"00:13:05","type":"button2","addr":"15","quality":"130"}
+
+topic:gateway/upline
+{"mac":"00:13:05""}

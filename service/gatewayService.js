@@ -7,7 +7,7 @@ var DeviceEntity = require('../models/device').DeviceEntity;
 
 exports.gupline = function(mac){
 	console.log('gupline:' + mac);
-	GateEntity.update({mac:mac},{online:true,mac:mac},{upsert:true},function(err,gateway){
+	GateEntity.update({mac:mac},{online:true,mac:mac,lastTime:Date.now(),createTime:Date.now()},{upsert:true},function(err,gateway){
                  if(err){//查询异常
                         console.log("gws db error")
                  return;
@@ -42,7 +42,7 @@ exports.gdropline = function(mac){
 };
 
 
-exports.upline = function(name,addr,gmac,mac,type){
+exports.upline = function(status,addr,gmac,mac,type){
 	console.log('upline:' + mac);
         GateEntity.update({mac:gmac}, {online:true,mac:gmac},{upsert:true},  function(err, result){ //findOne({uid:req.params.uid},function(err,user){
                  if(err){//查询异常
@@ -56,12 +56,12 @@ exports.upline = function(name,addr,gmac,mac,type){
 		console.log('find device');
 		if(!res){
 			console.log('new device');
-			GateEntity.update({mac:gmac},{$push:{device:{'name':name,'lastTime':Date.now(),'addr':addr,'mac':mac,'online':true,'type':type,'creatTime':Date.now()}}},{upsert:true},function(err,res){
+			GateEntity.update({mac:gmac},{$push:{device:{'status':status,'lastTime':Date.now(),'addr':addr,'mac':mac,'online':true,'type':type,'creatTime':Date.now()}}},{upsert:true},function(err,res){
 				if(err)
 					console.log('add device err'+err);
 			});
 		}else{
-			GateEntity.update({"device.mac":mac},{$set:{'device.$.name':name,'device.$.addr':addr,'device.$.mac':mac,'device.$.online':true,'device.$.type':type,'device.$.lastTime':Date.now()}},{upsert:true},function(err,res){
+			GateEntity.update({"device.mac":mac},{$set:{'device.$.status':status,'device.$.addr':addr,'device.$.mac':mac,'device.$.online':true,'device.$.type':type,'device.$.lastTime':Date.now()}},{upsert:true},function(err,res){
 		                if(err){
                 		        console.log(err);
 		                        return;

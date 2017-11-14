@@ -34,7 +34,7 @@ var mq = function(){
 			}
 		
 			if(topic === 'device/upline'){
-                	        gatewayService.upline(msg.name,msg.addr,msg.gmac,msg.mac,msg.type);
+                	        gatewayService.upline(msg.status,msg.addr,msg.gmac,msg.mac,msg.type);
                		}
 
 		}catch(err){

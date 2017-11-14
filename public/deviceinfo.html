@@ -39,46 +39,46 @@
           <label class="pull-left">
             别名
           </label>
-          <input type="text" class="form-control">
+          <input type="text" class="form-control" ng-model="device.name">
         </div>
-        <button type="submit" class="btn btn-success">
+        <button type="submit" class="btn btn-success" ng-click="save()">
           保存别名
         </button>
         <div class="form-group">
           <label class="pull-left">
             mac地址
           </label>
-          <input type="text" class="form-control">
+          <input type="text" class="form-control" ng-model="device.mac">
         </div>
         <div class="form-group">
           <label class="pull-left">
             短地址
           </label>
-          <input type="text" class="form-control">
+          <input type="text" class="form-control" ng-model="device.addr">
         </div>
         <div class="form-group">
           <label class="pull-left">
             注册时间
           </label>
-          <input type="text" class="form-control">
+          <input type="text" class="form-control" ng-model = "device.creatTime">
         </div>
         <div class="form-group">
           <label class="pull-left">
             类型
           </label>
-          <input type="text" class="form-control">
+          <input type="text" class="form-control" ng-model = "device.type">
         </div>
         <div class="form-group">
           <label class="pull-left">
             所属网关
           </label>
-          <input type="text" class="form-control">
+          <input type="text" class="form-control" ng-model = "gateway">
         </div>
-        <a href="device.html" class="btn btn-default">返回</a>
-        <button type="submit" class="btn btn-danger pull-right">
+        <button type="submit" class="btn btn-default" ng-click="goback2()" >返回</button>
+        <button type="submit" class="btn btn-danger pull-right" ng-click="del()">
           删除设备
         </button>
-        <button type="submit" class="btn pull-left btn-warning">
+        <button type="submit" class="btn pull-left btn-warning" ng-click="find()">
           寻找设备
         </button>
       </div>
@@ -86,21 +86,79 @@
 <script>
 var app = angular.module('myApp', []);
 
-app.controller('siteCtrl', function($scope, $http, $location) {
+app.controller('siteCtrl', function($scope, $http, $location,$window) {
         console.log($location);
         console.log('hash:'+$location.hash());
-        $http({
+var uid;
+$http({
                 method: 'GET',
-                url: '/getid/' + $location.hash()
+                url: '/getdeviceinfo/'+ $location.hash().split('?',1)
         }).then(function successCallback(response) {
-                        $scope.name = response.data;
-                        console.log(response);
+                //= JSON.parse(response);
+                         $scope.device = response.data;
+                         console.log(response);
                 }, function errorCallback(response) {
                         console.log('get err');
                         // 请求失败执行代码
         });
 
+
+$http({
+                method: 'GET',
+                url: '/getgatewaybydevice/'+ $location.hash().split('?',1)
+        }).then(function successCallback(response) {
+                //= JSON.parse(response);
+                         $scope.gateway = response.data.gateway;
+                        $scope.name = response.data.name; 
+			uid = response.data.uid;
+			console.log(response);
+                }, function errorCallback(response) {
+                        console.log('get err');
+                        // 请求失败执行代码
+        });
+
+
+	$scope.save = function(){
+                $http({
+                method: 'POST',
+                url: '/setdevicebymac/',
+                data:{'mac':$location.hash().split('?',1),'name':$scope.device.name}
+                 }).then(function successCallback(response) {
+                        console.log(response);
+                        }, function errorCallback(response) {
+                        console.log('setdevicebymac return err');
+                        // 请求失败执行代码
+
+                        });
+
+         };
+
+	$scope.goback2 = function(){
+           // 请求失败执行代码
+	//	$window.history.go(-1);
+		$window.location.href="device.html#"+uid;
+		console.log("goback");
+         };
+
+	$scope.del = function(){
+                $http({
+                method: 'POST',
+                url: '/removedevicebymac/',
+                data:{'mac':$location.hash().split('?',1)}
+                 }).then(function successCallback(response) {
+                        console.log(response);
+			$window.location.href="device.html#"+uid;			
+                        }, function errorCallback(response) {
+                        console.log('setdevicebymac return err');
+                        // 请求失败执行代码
+
+                        });
+
+         };
+
 });
+
+
 </script>
 
   </body>
