@@ -51,7 +51,7 @@
         <select class="form-control" ng-if="!dis" ng-model="polic.mac" ng-options="x.mac as (x.name+'('+x.chinesstype+')') for x in device">
           <option value="" >设备</option>        
         </select>
-	<input type="text" class="form-control" ng-if="dis && device" ng-disabled="true" ng-model="getdevicebymac(polic.mac).name">
+	<input type="text" class="form-control" ng-if="dis && device" ng-disabled="true" value="{{getdevicebymac(polic.mac).name}}({{getdevicebymac(polic.mac).chinesstype}})">
       </div>
       <div class="form-group">
         <label class="pull-left">
@@ -73,7 +73,6 @@
       <div class="btn-group">
         <a href="#" type="submit" class="btn btn-xs btn-info" ng-click="addaction()">添加动作</a>
         <a href="#" type="submit" class="btn btn-xs btn-primary" ng-click="adddelay()">添加延时</a>
-        <a href="#" type="submit" class="btn btn-xs btn-danger" ng-click="report()">保存</a>
       </div>
       <table class="table">
         <tbody>
@@ -84,7 +83,7 @@
               </select>
             </td>
             <td ng-if="x.type!='delay'">
-              <select  class="form-control" ng-if="device"  ng-model="polic.do[$index].action" ng-options="y.value as y.name for y in getdobymac(polic.do[0].mac)">
+              <select  class="form-control" ng-if="device"  ng-model="polic.do[$index].action" ng-options="y.value as y.name for y in getdobymac(polic.do[$index].mac)">
                 <option value="">动作</option>
               </select>
             </td>
