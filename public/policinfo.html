@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+  
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>
+    </title>
+    <link href="/bootstrap.min.css"
+    rel="stylesheet">
+    <script src="/angular.min.js"></script>
+  </head>
+  
+  <body ng-app="myApp" ng-controller="siteCtrl">
+    <h3>
+      &nbsp; &nbsp;欢迎回家，{{name}}
+    </h3>
+    <script src="/jquery.min.js"
+    >
+    </script>
+    <script src="/bootstrap.min.js"
+    >
+    </script>
+    <div class="container text-center">
+      <span class="label label-default"></span>
+      <label class="pull-left">
+        场景详情
+      </label>
+      <div>
+        <b><br></b>
+        <ul class="list-group">
+        </ul>
+        <div class="form-group">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="pull-left">
+          场景名称
+        </label>
+        <input type="text" class="form-control" ng-model="polic.name">
+      </div>
+      <hr>
+      <div class="form-group">
+      </div>
+      <div class="form-group">
+        <label class="pull-left">
+          如果：
+        </label>
+        <select class="form-control" ng-if="!dis" ng-model="polic.mac" ng-options="x.mac as (x.name+'('+x.chinesstype+')') for x in device">
+          <option value="" >设备</option>        
+        </select>
+	<input type="text" class="form-control" ng-if="dis && device" ng-disabled="true" ng-model="getdevicebymac(polic.mac).name">
+      </div>
+      <div class="form-group">
+        <label class="pull-left">
+          触发:
+        </label>
+        <select class="form-control" ng-if="!dis && device" ng-model="polic.event" ng-options="y.value as y.name for y in geteventbymac(polic.mac)">
+          <option value="" >事件</option>
+        </select>
+	<input type="text" class="form-control" ng-if="dis && device" ng-disabled="true" value="{{geteventname(polic.mac,polic.event)}}">
+      </div>
+      <hr>
+      <label class="pull-left">
+        那么:
+      </label>
+      <ul class="list-group">
+      </ul>
+      <ul class="list-group">
+      </ul>
+      <div class="btn-group">
+        <a href="#" type="submit" class="btn btn-xs btn-info" ng-click="addaction()">添加动作</a>
+        <a href="#" type="submit" class="btn btn-xs btn-primary" ng-click="adddelay()">添加延时</a>
+        <a href="#" type="submit" class="btn btn-xs btn-danger" ng-click="report()">保存</a>
+      </div>
+      <table class="table">
+        <tbody>
+          <tr ng-repeat="x in polic.do">
+            <td ng-if="x.type!='delay'">
+              <select class="form-control"  ng-model="polic.do[$index].mac" ng-options="y.mac as (y.name+'('+y.chinesstype+')') for y in device">
+                <option value="">设备</option>
+              </select>
+            </td>
+            <td ng-if="x.type!='delay'">
+              <select  class="form-control" ng-if="device"  ng-model="polic.do[$index].action" ng-options="y.value as y.name for y in getdobymac(polic.do[0].mac)">
+                <option value="">动作</option>
+              </select>
+            </td>
+            </td>
+            <td ng-if="x.type=='delay'">
+              <select  class="form-control" ng-model="polic.do[$index].action" ng-options="y.value as y.name for y in timelist">
+                <option value="">时间</option>
+              </select>
+            </td>
+	    <td ng-if="x.type=='delay'">
+            </td>
+
+            <td>
+              <a href="#" class="btn btn-xs btn-danger pull-right" type="submit" ng-click="polic.do.splice($index,1)">删除</a>
+            </td>
+          </tr>          
+        </tbody>
+      </table>
+      <hr>
+      <button type="submit" ng-click="gotopolic()" class="btn btn-default pull-left btn-sm">
+        返回
+      </button>
+      <button  type="submit" class="btn pull-right btn-success btn-sm" ng-click="report()">
+        保存
+      </button>
+    </div>
+    <hr>
+
+    <script>
+var app = angular.module('myApp', []);
+app.config(['$locationProvider', function($locationProvider) {  
+         // $locationProvider.html5Mode(true);  
+         $locationProvider.html5Mode({
+          enabled: true,
+          requireBase: false
+        });
+}]);
+
+
+app.controller('siteCtrl', function($scope, $window,$http, $location) {
+	var uid = $location.search().uid;
+        console.log($location);
+        console.log('hash:'+$location.search().uid);
+        $http({
+                method: 'GET',
+                url: '/getuserbyuid/' + $location.search().uid
+        }).then(function successCallback(response) {
+                        $scope.name = response.data.name;
+                        console.log(response);
+                }, function errorCallback(response) {
+                        console.log('get err');
+                        // 请求失败执行代码
+        });
+
+	var getdevice = function(){
+        $http({
+                method: 'GET',
+                url: '/getdevicebyuser/'+ $location.search().uid.split('?',1)
+        }).then(function successCallback(response) {
+                //= JSON.parse(response);
+                         $scope.device = response.data;
+			 devicec = response.data;
+                         console.log(response);
+                }, function errorCallback(response) {
+                        console.log('get err');
+                        // 请求失败执行代码
+        });
+        }
+	$scope.getdevicebymac=function(x){
+		for( i of $scope.device){
+			//	console.log(i);
+	
+			if(i.mac == x){
+				//console.log(i);
+				return i;
+			}
+		}
+	}
+
+	$scope.geteventbymac=function(x){
+	//	console.log('device='+JSON.stringify(devicec));
+	//	console.log('length='+devicec.lenght);
+		for( i of $scope.device){
+			//	console.log(i);
+	
+			if(i.mac == x){
+				//console.log(i);
+				return i.event;
+			}
+		}
+	}
+        $scope.geteventname=function(mac,event){
+        //      console.log('device='+JSON.stringify(devicec));
+        //      console.log('length='+devicec.lenght);
+                for( i of $scope.device){
+                        //      console.log(i);
+
+                        if(i.mac == mac){
+				for(j of i.event){
+					if(j.value == event)
+						if(!j.name)
+							return "未找到";
+						else return j.name;
+				}
+                        }
+                }
+        }
+
+        $scope.getdobymac=function(x){
+                for( i of $scope.device){
+                        if(i.mac == x){
+                                return i.do;
+                        }
+                }
+        }
+
+        if($location.search().mac){
+		console.log('have mac');
+		$scope.dis = true;
+		$http({
+        	        method: 'POST',
+	                url: '/getpolicbymacevent/',
+			data:{"mac":$location.search().mac,"event":$location.search().event}
+	        }).then(function successCallback(response) {
+        	        //= JSON.parse(response);
+                         $scope.polic = response.data[0];
+/*
+			for(var i=0;i<response.data[0].do.length;i++){
+				var temp={
+					"type":"",
+					"action":{"value":"","name":""}
+				};
+				temp.type=response.data[0].do[i].type;
+				temp.device=getdevicebymac(response.data[0].do[i].mac);
+				temp.action.value=response.data[0].do[i].action;
+				temp.action.name=response.data[0].do[i].action;
+				$scope.dolist.push(temp);
+			}
+
+                         console.log(response);
+                         console.log('dolist:'+JSON.stringify($scope.dolist)); 
+*/
+	               	 }, function errorCallback(response) {
+        	                console.log('get err');
+                        // 请求失败执行代码
+	        });
+	}else{
+		$scope.dis = false;
+		$scope.polic={
+			'type':'device',
+			'mac':'',
+			'event':'',
+			'do':[{'action':'','value':''}],
+			'name':''
+		}
+		//$scope.polic.push(temp);
+	}
+	
+
+        getdevice();
+
+	$scope.addaction=function(){
+		console.log('polic'+$scope.polic);
+		$scope.polic.do.push({});
+	}
+	
+	$scope.adddelay=function(){
+                console.log('polic:'+$scope.polic);
+		var temp = {"type":"delay"}
+                $scope.polic.do.push(temp);
+        }
+
+	$scope.timelist=[
+		{'name':'1秒','value':'1'},
+		{'name':'5秒','value':'5'},
+		{'name':'30秒','value':'30'},
+		{'name':'1分','value':'60'},
+		{'name':'5分','value':'300'}
+	];
+
+	$scope.gotopolic = function(){
+           // 请求失败执行代码
+        //      $window.history.go(-1);
+                $window.location.href="polic.html#"+uid;
+                console.log("goback");
+         };
+
+
+	$scope.report=function(){
+		console.log($scope.polic);
+/*		$scope.polic.mac = $scope.dev.mac;
+		$scope.polic.event = $scope.even.value;
+		console.log($scope.dolist);
+		for(var i=0;i< $scope.dolist.length;i++){
+			var temp={
+				'mac':'',
+				'action':'',
+				'type':'device'	
+			};
+			console.log($scope.dolist[i]);
+			if($scope.dolist[i].type != 'delay'){
+				temp.mac=$scope.dolist[i].device.mac;
+			}
+			temp.action=$scope.dolist[i].action.value;
+			if($scope.dolist[i].type == 'delay'){
+				temp.type=$scope.dolist[i].type;
+			}
+			$scope.polic.do.push(temp);
+		}
+		console.log($scope.polic);
+*/ 
+                $http({
+                method: 'POST',
+                url: '/setpolicbymac/',
+                data:$scope.polic
+                 }).then(function successCallback(response) {
+                        console.log(response);
+                        }, function errorCallback(response) {
+                        console.log('setdevicebymac return err');
+                        // 请求失败执行代码
+
+                });
+
+	}
+
+});
+</script>
+  </body>
+
+</html>
