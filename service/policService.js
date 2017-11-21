@@ -8,7 +8,7 @@ var mqtt = require('../mqtt/mq');
 var gatewayService = require('./gatewayService');
 var async = require('async');
 //router.use(express.query());
-
+var doing = new Array();
 exports.execPolic = function(mac,event){
 	console.log('execpolic:' + mac + '|' + event);
 	PolicEntity.find({mac:mac,event:event},{'_id':0},function(err,polic){
@@ -18,7 +18,9 @@ exports.execPolic = function(mac,event){
         }
         
         if (polic[0]){
-            if (polic[0].do.length){
+            if (polic[0].do.length && find(mac,event)<0){
+                doing.push({mac:mac,event:event});
+                console.log("doing: " + doing);
                 console.log("polic:" + mac + '|' + event + polic[0].do);               
                 var j=polic[0].do.length;
                 var count = 0;  
@@ -40,10 +42,10 @@ exports.execPolic = function(mac,event){
                         }
                     }
 
-                    if (count>j) {  
-                        callback("errmessage");  
-                        return;  
-                    } 
+                    if(count == j){
+                        doing.splice(find(mac,event),1);
+                    }
+                    
                                                               
                                              
                 },  
@@ -56,11 +58,17 @@ exports.execPolic = function(mac,event){
         }else{
             console.log("polic:" + mac + '|' + event + "not find");
             return false;
-}
+        }
 	});
-
-
 };
+
+var find = function(mac,event){
+    for(var i =0;i<doing.length;i++){
+        if(doing[i].mac == mac && doing[i].event == event)
+            return i;
+    }
+    return -1;
+}
 
 var sendCommond = function(mac,action){
     GateEntity.find({'device.mac':mac},{device:{'$elemMatch':{mac:mac}} },function(err, device){ //findOne({uid:req.params.uid},function(err,user){
