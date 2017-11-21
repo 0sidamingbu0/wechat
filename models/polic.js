@@ -8,7 +8,7 @@ var PolicScheme =new base.Schema({
 	name:String,
  	do:[{
 		mac:{type:String},
-                type:{type:String},
+                type:{type:String,default:'device'},
 		action:{type:String}
 	}]
   

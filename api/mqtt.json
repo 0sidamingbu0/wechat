@@ -1,6 +1,71 @@
-topic:device/upline
-msg:
-{"gmac":"b8:02","mac":"00:13:05","type":"button2","addr":"15","quality":"130"}
+up:
+deviceReg:
+payload: {
+    "address":address,
+    "mac":"mac",             
+    "type":"Mibutton",
+    "resourceSum":"resourceSum",
+    "packetType":"deviceReg"
+}
 
-topic:gateway/upline
-{"mac":"00:13:05""}
+reportStatus:
+payload: {
+    "address":address,
+    "mac":"mac",             
+    "status":"status",
+    "packetType":"reportStatus"
+}
+
+reportAddr:
+payload: {
+    "address":address,
+    "mac":"mac",             
+    "packetType":"reportAddr"
+}
+
+reportEvent:
+payload: {
+    "address":address,
+    "mac":"mac",             
+    "event":"3PressDown",    
+    "packetType":"reportEvent"
+}
+
+reportValue:
+payload: {
+    "address":address,
+    "mac":"mac",             
+    "event":"PressDown",
+    "data":"22",    
+    "type":"Temperature",
+    "packetType":"reportValue"
+}
+==================================
+
+down:
+sendCommond:
+payload: {
+    "address":dev.addr,
+    "index":index,
+    "command":action, 
+    "commandData":"",               
+    "resourceSum":dev.resourceSum,
+    "type":"sendCommond"
+}
+
+sendRegister:
+payload: {
+    "address":dev.addr,
+    "type":"sendRegister"                       
+}
+
+sendDel:
+payload: {
+    "address":dev.addr,
+    "type":"sendDel"                       
+}
+
+permitJoin:
+payload: {
+    "type":"permitJoin"                       
+}

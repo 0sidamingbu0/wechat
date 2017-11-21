@@ -12,13 +12,12 @@ var GateScheme =new base.Schema({
 		lastTime:{type:Date},
 		addr:{type:Number},
 		online:{type:Boolean},
-		status:{type:String},
+		status:[String],
 		name:{type:String,default:'未命名'},
+		resourceSum:{type:String},
 		registered:{type:Boolean,default:false}
 	}],
  	online:Boolean,
-	ip:String,
-	mqtt:String,
 	registered:{type:Boolean,default:false}
 });  
 GateScheme.index({mac:1},{"background" : true});//设置索引  

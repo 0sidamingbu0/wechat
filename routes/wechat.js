@@ -436,8 +436,8 @@ router.use('/getdevicebyuser/:uid',function(req,res){
                                                 case 'MagnetSensor':
                                                         console.log('is magnetsensor');
                                                         tempdev.event=[
-								{name:'关门',value:'PressDown'},
-								{name:'开门',value:'PressUp'}
+                            								{name:'关门',value:'PressDown'},
+                            								{name:'开门',value:'PressUp'}
                                                         ];
                                                         tempdev.do=[
                                                         ];
@@ -684,22 +684,22 @@ router.use('/', wechat(config, function(req, res, next) {
                		 if (user){//手机号已注册
 	                       	console.log("wechat menu find user:" + message.FromUserName + ' user:'+ user.name)
    				if (message.Event === 'CLICK' && message.EventKey === 'device') {
-			                res.reply('管理您的设备请<a href=\"http://yulurobot.cn/device.html#' + message.FromUserName  +'\">点我</a>');
+			                res.reply('<a href=\"http://yulurobot.cn/device.html#' + message.FromUserName  +'\">管理您的设备请点我</a>');
 			                console.log('管理您的设备请<a href=\"http://yulurobot.cn/device.html#' + message.FromUserName  +'\">点我</a>');
 			        }
 			        else if (message.Event === 'CLICK' && message.EventKey === 'polic') {
 
-			                res.reply('管理您的场景请<a href=\"http://yulurobot.cn/polic.html#' + message.FromUserName  +'\">点我</a>');
+			                res.reply('<a href=\"http://yulurobot.cn/polic.html#' + message.FromUserName  +'\">管理您的场景请点我</a>');
 			                console.log('<a href=\"http://www.yulurobot.cn/polic.htm#' + message.FromUserName  +'\">点我</a>');
 			        }
 			        else if (message.Event === 'CLICK' && message.EventKey === 'user') {
 
-		        	        res.reply('管理您的账户信息请<a href=\"http://yulurobot.cn/user.html#' + message.FromUserName  +'\">点我</a>');
+		        	        res.reply('<a href=\"http://yulurobot.cn/user.html#' + message.FromUserName  +'\">管理您的账户信息请点我</a>');
         		        	console.log('<a href=\"http://www.yulurobot.cn/user.html#' + message.FromUserName  +'\">点我</a>');
 			        }
 			        else if (message.Event === 'CLICK' && message.EventKey === 'gateway') {
 
-	        		        res.reply('管理您的网关请<a href=\"http://yulurobot.cn/gateway.html#'+ message.FromUserName  + '\">点我</a>');
+	        		        res.reply('<a href=\"http://yulurobot.cn/gateway.html#'+ message.FromUserName  + '\">管理您的网关请点我</a>');
 			                console.log('<a href=\"http://www.yulurobot.cn/gateway.html#' + message.FromUserName  +'\">点我</a>');
 			        }
 	
