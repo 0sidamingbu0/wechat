@@ -150,7 +150,7 @@ exports.reportValue = function(gmac,msg){
 exports.sendmsg = function(action){    
     console.log('sendCommond: '+action);
     
-    sendPost('https://sc.ftqq.com/SCU1247T4f6d392d81bb2e29cf723e311f9bf06d5795a12c0adba.send?text='+action,action);
+    sendPost('https://sc.ftqq.com/SCU1247T4f6d392d81bb2e29cf723e311f9bf06d5795a12c0adba.send?text='+action+'  时间'+Date.now(),action);
 }
 
 exports.sendCommond = function(mac,action){    
@@ -336,6 +336,7 @@ var sendPost = function(url,body){
             //logger.error("send message to zbClient failed: " + error);
         }
         else {
+            console.log('send post response:'+JSON.stringify(response));
             if (body.message === "success") {
             }
             else {
