@@ -48,10 +48,10 @@
         <label class="pull-left">
           如果：
         </label>
-        <select class="form-control" ng-if="!dis" ng-model="polic.mac" ng-options="x.mac as (x.name+'('+x.chinesstype+')') for x in device">
+        <select class="form-control" ng-if="!dis" ng-model="polic.mac" ng-options="x.mac as (x.name+'('+x.chinesetype+')') for x in device">
           <option value="" >设备</option>        
         </select>
-	<input type="text" class="form-control" ng-if="dis && device" ng-disabled="true" value="{{getdevicebymac(polic.mac).name}}({{getdevicebymac(polic.mac).chinesstype}})">
+	<input type="text" class="form-control" ng-if="dis && device" ng-disabled="true" value="{{getdevicebymac(polic.mac).name}}({{getdevicebymac(polic.mac).chinesetype}})">
       </div>
       <div class="form-group">
         <label class="pull-left">
@@ -74,11 +74,11 @@
         <a href="#" type="submit" class="btn btn-xs btn-info" ng-click="addaction()">添加动作</a>
         <a href="#" type="submit" class="btn btn-xs btn-primary" ng-click="adddelay()">添加延时</a>
       </div>
-      <table class="table">
+      <table class="table" style="vertical-align: middle !important;text-align: center;">
         <tbody>
           <tr ng-repeat="x in polic.do">
             <td ng-if="x.type!='delay'">
-              <select class="form-control"  ng-model="polic.do[$index].mac" ng-options="y.mac as (y.name+'('+y.chinesstype+')') for y in device">
+              <select class="form-control"  ng-model="polic.do[$index].mac" ng-options="y.mac as (y.name+'('+y.chinesetype+')') for y in device">
                 <option value="">设备</option>
               </select>
             </td>
@@ -96,7 +96,7 @@
 	    <td ng-if="x.type=='delay'">
             </td>
 
-            <td>
+            <td style="vertical-align: middle !important;text-align: center;">
               <a href="#" class="btn btn-xs btn-danger pull-right" type="submit" ng-click="polic.do.splice($index,1)">删除</a>
             </td>
           </tr>          

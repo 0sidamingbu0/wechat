@@ -14,7 +14,6 @@ var GateScheme =new base.Schema({
 		online:{type:Boolean},
 		status:[String],
 		name:{type:String,default:'未命名'},
-		resourceSum:{type:String},
 		registered:{type:Boolean,default:false}
 	}],
  	online:Boolean,

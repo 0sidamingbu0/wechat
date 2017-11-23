@@ -26,7 +26,7 @@ exports.mqinit = function(){
  **/
 	MqttServer.on('published', function(packet, client) {
 	    	var topic = packet.topic;
-	   	 //console.log('message-arrived--->','topic ='+topic+',message = '+ packet.payload);
+	   	 console.log('message-arrived--->','topic ='+topic+',message = '+ packet.payload);
 		//console.log("packet: "+JSON.stringify(packet));		
 		//console.log("client: "+JSON.stringify(client));
 		try{
@@ -41,7 +41,7 @@ exports.mqinit = function(){
 	});
 
 var parseMsg = function(packet){
-    console.log('parseMsg:' + packet.topic + '|' + packet.payload);
+    console.log('parseMsg:' + packet.topic );
     var msg;
     try{
             msg = JSON.parse(packet.payload);
@@ -97,7 +97,7 @@ var parseMsg = function(packet){
 
 
 exports.sendCommond = function(msg){	
-	console.log("mq sendCommond:"+JSON.stringify(msg));
+	//console.log("mq sendCommond:"+JSON.stringify(msg));
 	var msg2 = {
 		topic: 'b8:02',
 		payload: 'hello!',
@@ -105,6 +105,6 @@ exports.sendCommond = function(msg){
 		retain: false
 	};
 	MqttServer.publish(msg, function () {
-        console.log('mq sendCommond');
+        //console.log('mq sendCommond');
 	 	});
 }
