@@ -4,6 +4,7 @@ var UserEntity = require('../models/user').UserEntity;
 var GateEntity = require('../models/gateway').GateEntity;
 var DeviceEntity = require('../models/device').DeviceEntity;
 var mqtt = require('../mqtt/mq');
+var request = require("request");
 var policService = require('./policService');
 //router.use(express.query());
 
@@ -119,24 +120,13 @@ exports.reportAddr = function(gmac,msg){
             console.log('deviceReg find device err'+err);
         
         if(!res){
-            console.log('new device');
-            GateEntity.update({mac:gmac},
-                {$push:{device:{
-                    'lastTime':Date.now(),
-                    'addr':msg.address,
-                    'online':true
-                }
-                }},{upsert:true},function(err,res){
-                
-                if(err)
-                    console.log('add device err'+err);
-               }
-            );
+            console.log('not found device');
+            
         }else{
             console.log('change device');
-            GateEntity.update({"device.mac":mac},
+            GateEntity.update({"device.mac":msg.mac},
                 {$set:{
-                    'device.$.addr':address,
+                    'device.$.addr':msg.address,
                     'device.$.online':true,
                     'device.$.lastTime':Date.now()
                 }},{upsert:true},function(err,res){
@@ -156,6 +146,13 @@ exports.reportValue = function(gmac,msg){
     
 }
 //============================================================
+
+exports.sendmsg = function(action){    
+    console.log('sendCommond: '+action);
+    
+    sendPost('https://sc.ftqq.com/SCU1247T4f6d392d81bb2e29cf723e311f9bf06d5795a12c0adba.send?text='+action,action);
+}
+
 exports.sendCommond = function(mac,action){    
     console.log('sendCommond: '+mac+'|'+action);
     var dev;
@@ -316,11 +313,34 @@ exports.permitJoin = function(gmac){
     console.log('permitJoin: '+gmac);
     var msg =   {
                     topic: gmac,
-                    payload: {                        
-                        "packetType":"permitJoin"                        
-                    },
+                    payload: "{\"packetType\":\"permitJoin\"}",
                     qos: 0,
                     retain: false
                 };
     mqtt.sendCommond(msg);
+}
+
+var sendPost = function(url,body){
+    var options = {
+        url:  url,
+        method: "POST",
+        json: true,
+        headers: {
+            "Content-Type": "application/json; charset=UTF-8"
+        },
+        body: body
+    };     
+    console.log('send post: '+url+'|'+body);
+    request(options, function (error, response, body) {
+        if (error) {
+            //logger.error("send message to zbClient failed: " + error);
+        }
+        else {
+            if (body.message === "success") {
+            }
+            else {
+                //logger.error("send message to zbClient failed. ");
+            }
+        }
+    });
 }

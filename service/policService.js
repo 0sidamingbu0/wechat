@@ -35,7 +35,7 @@ exports.execPolic = function(mac,event){
                                callback();
                             } 
                         },polic[0].do[count-1].action*1000);
-                    }else{
+                    }else if(polic[0].do[count-1].type=="device"){
                         console.log("polic command: " +count+'|'+ polic[0].do[count-1].mac+'|'+polic[0].do[count-1].action);
                         gatewayService.sendCommond(polic[0].do[count-1].mac,polic[0].do[count-1].action);
                         
@@ -44,6 +44,8 @@ exports.execPolic = function(mac,event){
                                callback();
                             } 
                         },100);
+                    }else if(polic[0].do[count-1].type=="msg"){
+                        gatewayService.sendmsg(polic[0].do[count-1].action);
                     }
 
                     if(count == j){

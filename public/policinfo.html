@@ -73,27 +73,36 @@
       <div class="btn-group">
         <a href="#" type="submit" class="btn btn-xs btn-info" ng-click="addaction()">添加动作</a>
         <a href="#" type="submit" class="btn btn-xs btn-primary" ng-click="adddelay()">添加延时</a>
+        <a href="#" type="submit" class="btn btn-xs btn-default" ng-click="addmsg(x)">添加通知</a>
       </div>
       <table class="table" style="vertical-align: middle !important;text-align: center;">
         <tbody>
           <tr ng-repeat="x in polic.do">
-            <td ng-if="x.type!='delay'">
+            <td ng-if="x.type=='device'||!x.type">
               <select class="form-control"  ng-model="polic.do[$index].mac" ng-options="y.mac as (y.name+'('+y.chinesetype+')') for y in device">
                 <option value="">设备</option>
               </select>
-            </td>
-            <td ng-if="x.type!='delay'">
+            </td>            
+            <td ng-if="x.type=='device'||!x.type">
               <select  class="form-control" ng-if="device"  ng-model="polic.do[$index].action" ng-options="y.value as y.name for y in getdobymac(polic.do[$index].mac)">
                 <option value="">动作</option>
               </select>
             </td>
+
             </td>
             <td ng-if="x.type=='delay'">
               <select  class="form-control" ng-model="polic.do[$index].action" ng-options="y.value as y.name for y in timelist">
                 <option value="">时间</option>
               </select>
             </td>
-	    <td ng-if="x.type=='delay'">
+	          <td ng-if="x.type=='delay'">
+            </td>
+
+            <td ng-if="x.type =='msg'">
+              消息：
+            </td>
+            <td ng-if="x.type =='msg'">
+              <input type="text" class="form-control" ng-model="x.action">
             </td>
 
             <td style="vertical-align: middle !important;text-align: center;">
@@ -250,6 +259,14 @@ app.controller('siteCtrl', function($scope, $window,$http, $location) {
 		$scope.polic.do.push({});
 	}
 	
+
+  $scope.addmsg=function(x){
+                console.log('polic:'+$scope.polic);
+    var temp = {"type":"msg","action":x}
+                $scope.polic.do.push(temp);
+  }
+  
+
 	$scope.adddelay=function(){
                 console.log('polic:'+$scope.polic);
 		var temp = {"type":"delay"}

@@ -16,8 +16,9 @@ var PolicEntity = require('../models/polic').PolicEntity;
 var gatewayService = require('../service/gatewayService');
 //router.use(express.query());
 router.use('/joinbymac/',  function(req, res, next) {
-        console.log('joinbynac'+req.body.mac);
-	res.send('{}');
+    console.log('joinbymac'+req.body.mac);
+	gatewayService.permitJoin(req.body.mac);
+    res.send('ok');
 });
 
 router.use('/sendbymac/',function(req,res){
@@ -198,7 +199,7 @@ router.use('/removedevicebymac/',function(req,res){
                         return;
                 }
         });
-        
+
         console.log("update result:" )
         res.send("ok");
 
@@ -347,7 +348,7 @@ router.use('/getdevicebyuser/:uid',function(req,res){
                  return;
                 }
 			var temp=new Array();
-			var num = 0;
+		
 			for(var i=0 ;i<device.length ;i++){
 				for(var j =0;j<device[i].device.length;j++){
 					var tempdev = JSON.parse(JSON.stringify(device[i].device[j]));
@@ -518,23 +519,156 @@ router.use('/getdevicebygateway/:mac',function(req,res){
                  return;
                 }
 
-			var temp=device[0].device;
-			for(var i=0;i<temp.length;i++)
-                        {
-                                //console.log(temp[i]);
-                                switch(temp[i].status){
-                                        case 'on':temp[i].status = '开';break;
-                                        case 'off':temp[i].status = '关';break;
-                                        default :temp[i].status =       '未知';break;
-                                }
-                                if(temp[i].online == false){
-                                        temp[i].status = '离线';
-                                }
-                                if(temp[i].registered == false){
-                                        temp[i].status = '未注册';
-                                }
+			var temp = new Array();
+			for(var i=0 ;i<device.length ;i++){
+                for(var j =0;j<device[i].device.length;j++){
+                    var tempdev = JSON.parse(JSON.stringify(device[i].device[j]));
+                    switch(tempdev.type){
+                        case 'MiButton':
+                            console.log('is mibutton');
+                            tempdev.event=[
+                                {name:'按下',value:'PressDown'},
+                                {name:'释放',value:'PressUp'},
+                                {name:'双击',value:'DoubleClick'}
+                            ];
+                            tempdev.do = {
+                                };
+                            tempdev.chinesetype='小米按钮';
+                        break;
+                        case '1_SwitchLightPanel':
+                            console.log('is 1switch');
+                            tempdev.event=[
+                                {name:'按下',value:'PressDown'},
+                                {name:'释放',value:'PressUp'}
+                            ];
+                            tempdev.do=[
+                                {name:'打开',value:'On'},
+                                {name:'关闭',value:'Off'},
+                                {name:'反转',value:'Reverse'}
+                            ];
+                            tempdev.chinesetype='1路开关';
+                        break;
+                        case '2_SwitchLightPanel':
+                                console.log('is 2switch');
+                                tempdev.event=[
+                                        {name:'1路按下',value:'1PressDown'},
+                                        {name:'1路释放',value:'1PressUp'},
+                                        {name:'2路按下',value:'2PressDown'},
+                                        {name:'2路释放',value:'2PressUp'}
+                                ];
+                                tempdev.do=[
+                                        {name:'1路打开',value:'1On'},
+                                        {name:'1路关闭',value:'1Off'},
+                                        {name:'1路反转',value:'1Reverse'},
+                                        {name:'2路打开',value:'2On'},
+                                        {name:'2路关闭',value:'2Off'},
+                                        {name:'2路反转',value:'2Reverse'}
+                                ];
+                                tempdev.chinesetype='2路开关';
+                        break;
+                        case '3_SwitchLightPanel':
+                                console.log('is 3switch');
+                                tempdev.event=[
+                                        {name:'1路按下',value:'1PressDown'},
+                                        {name:'1路释放',value:'1PressUp'},
+                                        {name:'2路按下',value:'2PressDown'},
+                                        {name:'2路释放',value:'2PressUp'},
+                                        {name:'3路按下',value:'3PressDown'},
+                                        {name:'3路释放',value:'3PressUp'}
+                                ];
+                                tempdev.do=[
+                                        {name:'1路打开',value:'1On'},
+                                        {name:'1路关闭',value:'1Off'},
+                                        {name:'1路反转',value:'1Reverse'},
+                                        {name:'2路打开',value:'2On'},
+                                        {name:'2路关闭',value:'2Off'},
+                                        {name:'2路反转',value:'2Reverse'},
+                                        {name:'3路打开',value:'3On'},
+                                        {name:'3路关闭',value:'3Off'},
+                                        {name:'3路反转',value:'3Reverse'}
+                                ];
+                                tempdev.chinesetype='3路开关';
+                        break;
 
-                        }
+                        case 'PowerPanel':
+                                console.log('is powerpanel');
+                                tempdev.event=[
+                                        {name:'按下',value:'PressDown'},
+                                        {name:'释放',value:'PressUp'}
+                                ];
+                                tempdev.do=[
+                                        {name:'打开',value:'On'},
+                                        {name:'关闭',value:'Off'},
+                                        {name:'反转',value:'Reverse'}
+                                ];
+                                tempdev.chinesetype='插座';
+                        break;
+                        case 'PowerPanel_Mi':
+                                console.log('is powerpanelMi');
+                                tempdev.event={};
+                                tempdev.do=[
+                                        {name:'打开',value:'On'},
+                                        {name:'关闭',value:'Off'},
+                                        {name:'反转',value:'Reverse'}
+                                ];
+                                tempdev.chinesetype='小米插座';
+                        break;
+                        case 'BodySensor':
+                                console.log('is bodysensor');
+                                tempdev.event=[
+                                        {name:'人体移动',value:'BodyMove'},
+                                ];
+                                tempdev.do=[
+                                ];
+                                tempdev.chinesetype='人体感应';
+                        break;
+                        case 'MagnetSensor':
+                                console.log('is magnetsensor');
+                                tempdev.event=[
+                                    {name:'关门',value:'PressDown'},
+                                    {name:'开门',value:'PressUp'}
+                                ];
+                                tempdev.do=[
+                                ];
+                                tempdev.chinesetype='门窗传感器';
+                        break;
+                        case 'TemperatureSensor':
+                                console.log('is TemperatureSensor');
+                                tempdev.event=[
+                                        {name:'温度',value:'Temperature'},
+                                        {name:'湿度',value:'Humidity'}
+                                ];
+                                tempdev.do=[
+                                ];
+                                tempdev.chinesetype='温湿度传感器';
+                        break;
+
+                    }
+                    temp.push(tempdev);
+                                        
+                }
+                    
+            }
+            for(var i=0;i<temp.length;i++)
+            {
+                //console.log(temp[i]);
+                for(var j=0;j<temp[i].status.length;j++)
+                {
+                    switch(temp[i].status[j]){
+                        case '1':temp[i].status[j] = '开';break;
+                        case '0':temp[i].status[j] = '关';break;
+                        default :temp[i].status[j] ='未知';break;
+                    }   
+                }
+                if(temp[i].online == false){
+                    temp[i].status = ['离线'];
+                }
+                if(temp[i].registered == false){
+                    temp[i].status = ['未注册'];
+                }
+                
+                
+            }
 
 			console.log("devicebygateway:"+temp);
                         res.send(temp);

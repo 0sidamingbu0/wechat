@@ -70,6 +70,7 @@
               <div class="text-left">
 		<button class="btn btn-success btn-xs" ng-click="savedevice(y)">注册</button>
 		<button class="btn btn-danger btn-xs" ng-click="deldevice(y)">删除</button>
+    <button class="btn btn-primary btn-xs" ng-click="finddevice(y)">寻找</button>
               </div>
 
             </div>
@@ -83,7 +84,7 @@
             
 	      </div>
             <div class="modal-footer">
-		<button type="button" class="btn btn-primary" ng-click = "join(lastgateway)">允许添加</button>
+		<button type="button" class="btn btn-primary" ng-click = "join(lastgateway)">开始添加</button>
                 <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
             </div>
         </div><!-- /.modal-content -->
@@ -109,6 +110,9 @@
               </div>
               <div class="text-left">
                 注册时间：{{x.createTime}}
+              </div>
+              <div class="text-left">
+                状态：{{x.online}}
               </div>
             </div>
             <div>
@@ -161,22 +165,38 @@ app.controller('siteCtrl', function($scope, $http, $location,$window,$timeout,$i
                         console.log('get err');
                         // 请求失败执行代码
         });
-        $scope.savedevice = function(y){
-		$http({
-                method: 'POST',
-                url: '/setdevicebymac/',
-                data:{'mac':y.mac,'name':y.name}
-                 }).then(function successCallback(response) {
-                        console.log(response);
-                        }, function errorCallback(response) {
-                        console.log('setdevicebymac return err');
-                        // 请求失败执行代码
+        
+    $scope.deldevice = function(y){
+      $http({
+          method: 'POST',
+          url: '/removedevicebymac/',
+          data:{'mac':y.mac}
+      }).then(function successCallback(response) {
+          console.log(response);
+          }, function errorCallback(response) {
+          console.log('setdevicebymac return err');
+      });
 
-                        });
-		$timeout(function(){
-			getdevice(lastgateway);
-			},500);
-         };
+      $timeout(function(){
+      getdevice(lastgateway);
+      },500);
+    };
+        
+    $scope.savedevice = function(y){
+      $http({
+          method: 'POST',
+          url: '/setdevicebymac/',
+          data:{'mac':y.mac,'name':y.name}
+      }).then(function successCallback(response) {
+          console.log(response);
+          }, function errorCallback(response) {
+          console.log('setdevicebymac return err');
+      });
+
+      $timeout(function(){
+      getdevice(lastgateway);
+      },500);
+    };
 
 	$scope.save = function(y){
         console.log(y);
@@ -233,25 +253,60 @@ app.controller('siteCtrl', function($scope, $http, $location,$window,$timeout,$i
 
          };
 
+
+  $scope.finddevice = function(x){
+    console.log(x.mac);
+    var action = "Reverse";
+    if(x.type == '2_SwitchLightPanel' || x.type == '3_SwitchLightPanel'){
+      switch(no){
+        case 1:action = '1Reverse';break;
+      }
+    }
+    $http({
+    method: 'POST',
+    url: '/sendbymac/',
+    data:{mac:x.mac,do:action}
+     }).then(function successCallback(response) {
+      getdevice();
+      console.log(response);
+          }, function errorCallback(response) {
+          console.log('get err');
+          // 请求失败执行代码
+          }
+    );
+  };
+
 	$scope.adddevice = function(x){
 		lastgateway = x;
 		getdevice(x);
-                $http({
-                method: 'POST',
-                url: '/joinbymac/',
-                data:{'mac':x.mac}
-                 }).then(function successCallback(response) {
-                        console.log(response);
-                        }, function errorCallback(response) {
-                        console.log('joinbymac return err');
-                        // 请求失败执行代码
+    
+    $http({
+        method: 'POST',
+        url: '/joinbymac/',
+        data:{'mac':x.mac}
+    }).then(function successCallback(response) {
+        console.log(response);
+        }, function errorCallback(response) {
+        console.log('joinbymac return err');
+        // 请求失败执行代码
 
-                        });
+    });
+
 		timer=$interval(function(){
 			getdevice(lastgateway);
-		},1000); 
-         };
-	
+		},5000); 
+  };
+
+  $scope.starttimer = function(){
+    timer=$interval(function(){
+      getdevice(lastgateway);
+    },1000); 
+  }
+
+	$scope.stoptimer = function(){
+    $interval.cancel(timer);
+  }
+
 	$scope.$on('destroy',function(){
    		$interval.cancel(timer);
 	})  //在控制器里，添加$on函数

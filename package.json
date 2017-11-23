@@ -17,6 +17,7 @@
     "mqtt": "^2.13.0",
     "node-weixin-menu": "^0.6.0",
     "redis": "^2.8.0",
+    "request": "^2.83.0",
     "sha1": "^1.1.1",
     "static-favicon": "^2.0.0-alpha",
     "util": "^0.10.3",

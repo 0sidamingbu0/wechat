@@ -27,11 +27,12 @@
     <div class="container">
       <span class="label label-default"></span>
       <label>
-        设备管理
+        设备管理 
       </label>
+      <p> 被控设备<input type="checkbox" ng-model="ctrled" ng-init="ctrled = true"> &nbsp;&nbsp; 非被控设备<input type="checkbox" ng-model="unctrled" ng-init="unctrled = false"></p>
       <p ng-if="!device.length" align:center>您还没有设备哦</p> <!--没有笔记时显示-->
       <ul class="list-group">
-        <li class="list-group-item" ng-repeat="x in device">
+        <li class="list-group-item" ng-repeat="x in device  track by $index" ng-if="(unctrled&&!x.do.length)||(ctrled&&x.do.length)">
           <div>
             {{x.name}}
             <div>
@@ -40,12 +41,35 @@
           </div>
           <div>
           </div>
-          <button type="submit" class="btn btn-danger" ng-click="close(x)">关闭</button>
-          <span class="badge">{{x.status}}</span>
+
+          <div class="btn-group">
+            <button type="submit" class="btn btn-danger dropdown-toggle"  ng-if="x.type == '2_SwitchLightPanel'||x.type == '3_SwitchLightPanel'" ng-disabled="!x.do.length"  data-toggle="dropdown">关闭 <span class="caret"></span></button>
+              <ul class="dropdown-menu">
+                <li><a ng-click="close(x,1)">1路</a></li>
+                <li><a ng-click="close(x,2)">2路</a></li>
+                <li ng-if="x.type == '3_SwitchLightPanel'"><a ng-click="close(x,3)">3路</a></li>
+              </ul>
+          </div>
+
+          <button type="submit" class="btn btn-danger "  ng-disabled="!x.do.length" ng-if="!(x.type == '2_SwitchLightPanel'||x.type == '3_SwitchLightPanel')" ng-click="close(x,1)">关闭</button>           
+
+          
           &nbsp;&nbsp;
-          <button type="submit"  class="btn btn-success" ng-click="open(x)">打开</button>
-       	  &nbsp;&nbsp;
-          <a href="deviceinfo.html#{{x.mac}}" class="btn btn-info">详情</a>
+
+          <div class="btn-group">
+            <button type="submit"  class="btn btn-success dropdown-toggle" ng-disabled="!x.do.length" ng-if="x.type == '2_SwitchLightPanel'||x.type == '3_SwitchLightPanel'" data-toggle="dropdown">打开 <span class="caret"></span></button>
+              <ul class="dropdown-menu">
+                <li><a ng-click="open(x,1)">1路</a></li>
+                <li><a ng-click="open(x,2)">2路</a></li>
+                <li ng-if="x.type == '3_SwitchLightPanel'"><a ng-click="open(x,3)">3路</a></li>
+              </ul>
+          </div>
+
+          <button type="submit"  class="btn btn-success " ng-if="!(x.type == '2_SwitchLightPanel'||x.type == '3_SwitchLightPanel')" ng-disabled="!x.do.length" ng-click="open(x,1)">打开</button>                      
+          &nbsp;&nbsp;
+          <a  href="deviceinfo.html#{{x.mac}}" class="btn btn-info">详情</a>
+
+          <span class="badge" ng-if="x.do.length" ng-repeat="y in x.status track by $index">{{y}}</span>
         </li>
       </ul>
       <div class="form-group">
@@ -54,7 +78,8 @@
 <script>
 var app = angular.module('myApp', []);
 
-app.controller('siteCtrl', function($scope, $http, $location) {
+app.controller('siteCtrl', function($scope, $http, $location,$window) {
+//  $scope.$on('locationChangeSuccess', $window.location.reload());
         console.log($location);
         console.log('hash:'+$location.hash());
         $http({
@@ -67,27 +92,61 @@ app.controller('siteCtrl', function($scope, $http, $location) {
                         console.log('get err');
                         // 请求失败执行代码
         });
-	var getdevice = function(){
-	$http({
+
+  var getdevice = function(){
+  $http({
                 method: 'GET',
                 url: '/getdevicebygateway/'+ $location.hash().split('?',1)
         }).then(function successCallback(response) {
-		//= JSON.parse(response);
-	                 $scope.device = response.data;
-			 console.log(response);
+    //= JSON.parse(response);
+                   $scope.device = response.data;
+       console.log(response);
                 }, function errorCallback(response) {
                         console.log('get err');
                         // 请求失败执行代码
         });
-	}
-        getdevice();
+  }
+  getdevice();  
 
-        $scope.open = function(x){
+        $scope.open = function(x,no){
                 console.log(x.mac);
+                var action = "On";
+                if(x.type == '2_SwitchLightPanel' || x.type == '3_SwitchLightPanel'){
+                  switch(no){
+                    case 1:action = '1On';break;
+                    case 2:action = '2On';break;
+                    case 3:action = '3On';break;
+                  }
+                }
                 $http({
                 method: 'POST',
                 url: '/sendbymac/',
-                data:{mac:x.mac,do:'on',num:'1'}
+                data:{mac:x.mac,do:action}
+                 }).then(function successCallback(response) {
+                  getdevice();
+      console.log(response);
+                        }, function errorCallback(response) {
+                        console.log('get err');
+                        // 请求失败执行代码
+                        }
+                );
+
+        };
+
+        $scope.close = function(x,no){
+                console.log(x.mac);
+                var action = "Off";
+                if(x.type == '2_SwitchLightPanel' || x.type == '3_SwitchLightPanel'){
+                  switch(no){
+                    case 1:action = '1Off';break;
+                    case 2:action = '2Off';break;
+                    case 3:action = '3Off';break;
+                  }
+                }
+                $http({
+                method: 'POST',
+                url: '/sendbymac/',
+                data:{mac:x.mac,do:action}
                  }).then(function successCallback(response) {
                         getdevice();
                         console.log(response);
@@ -98,22 +157,6 @@ app.controller('siteCtrl', function($scope, $http, $location) {
                 );
 
         };
-
-        $scope.close = function(x){
-                console.log(x.mac);
-                $http({
-                method: 'POST',
-                url: '/sendbymac/',
-                data:{mac:x.mac,do:'off',num:'1'}
-                 }).then(function successCallback(response) {
-                        getdevice();
-                        console.log(response);
-                        }, function errorCallback(response) {
-                        console.log('get err');
-                        // 请求失败执行代码
-                        }
-                );
-	}
 
 
 });
