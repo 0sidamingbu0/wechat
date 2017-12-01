@@ -11,6 +11,7 @@
     <link href="/bootstrap.min.css"
     rel="stylesheet">
     <script src="/angular.min.js"></script>
+    <script src="/angular-cookies.js"></script>
   </head>
 
   <body ng-app="myApp" ng-controller="siteCtrl">
@@ -122,7 +123,7 @@
             </div>
             <button data-toggle="modal" data-target="#myModaladddevice" class="btn btn-success btn-xs" ng-click="adddevice(x)">添加设备</button>
             &nbsp;
-           <a class="btn btn-success btn-xs"  href="gatewaydevice.html#{{x.mac}}" >子设备</a>
+           <button class="btn btn-success btn-xs"  ng-click="gotodevice(x.mac)" >子设备</button>
             &nbsp;
              <a class="btn btn-info btn-xs" ng-click="save(x)">修改别名</a>
             &nbsp;
@@ -137,35 +138,80 @@
     <hr>
 <script>
 
-var app = angular.module('myApp', []);
+var app = angular.module('myApp', ['ngCookies']);
 
-app.controller('siteCtrl', function($scope, $http, $location,$window,$timeout,$interval) {
+app.config(['$locationProvider', function($locationProvider) {  
+         // $locationProvider.html5Mode(true);  
+         $locationProvider.html5Mode({
+          enabled: true,
+          requireBase: false
+        });
+}]);
+
+app.controller('siteCtrl', function($cookieStore,$scope, $http, $location,$window,$timeout,$interval) {
 	var lastgateway;
 	var timer;
-        console.log($location);
-        console.log('hash:'+$location.hash());
-	$http({
+	var lastunregdevice={};
+        
+  var getgateway = function(uid){
+      $http({
+              method: 'GET',
+              url: '/getgatewaybyuser/'+ uid
+      }).then(function successCallback(response) {
+              //= JSON.parse(response);
+                       $scope.device = response.data;
+                       console.log(response);
+              }, function errorCallback(response) {
+                      console.log('get err');
+                      // 请求失败执行代码
+      });
+  }
+     var usercookies = $cookieStore.get("usercookies");
+    if(usercookies == 'undefined'){
+      $cookieStore.remove("usercookies");
+    }
+    var uid;
+    console.log('usercookies:'+usercookies);
+
+    
+
+    if(usercookies){
+        uid = usercookies;
+        $http({
                 method: 'GET',
-                url: '/getuserbyuid/' + $location.hash()
+                url: '/getuserbyuid/' + usercookies
         }).then(function successCallback(response) {
                         $scope.name = response.data.name;
-                        console.log(response);
+                        //console.log(response);
+                        console.log('getuserbycookie : '+usercookies);
                 }, function errorCallback(response) {
                         console.log('get err');
                         // 请求失败执行代码
         });
-	$http({
+        getgateway(uid);
+      }else{
+        $http({
                 method: 'GET',
-                url: '/getgatewaybyuser/'+ $location.hash().split('?',1)
+                url: '/getuserbycode/' + $location.search().code
         }).then(function successCallback(response) {
-                //= JSON.parse(response);
-                         $scope.device = response.data;
-                         console.log(response);
+                        $scope.name = response.data.name;
+                        console.log('getbycode: '+response.data.uid);
+                        uid = response.data.uid;
+                        getgateway(uid);
+                        $cookieStore.put("usercookies",response.data.uid);
                 }, function errorCallback(response) {
                         console.log('get err');
                         // 请求失败执行代码
         });
         
+      }
+
+    $scope.gotodevice = function(mac){
+        $window.location.href="device.html?gateway="+mac;
+        console.log("gotogatewaydevice");
+    };
+
+
     $scope.deldevice = function(y){
       $http({
           method: 'POST',
@@ -257,7 +303,7 @@ app.controller('siteCtrl', function($scope, $http, $location,$window,$timeout,$i
   $scope.finddevice = function(x){
     console.log(x.mac);
     var action = "Reverse";
-    if(x.type == '2_SwitchLightPanel' || x.type == '3_SwitchLightPanel'){
+    if(x.type == '2_SwitchLightPanel' || x.type == '3_SwitchLightPanel' || x.type == '2_CurtainPanel'){
       switch(no){
         case 1:action = '1Reverse';break;
       }
@@ -267,7 +313,7 @@ app.controller('siteCtrl', function($scope, $http, $location,$window,$timeout,$i
     url: '/sendbymac/',
     data:{mac:x.mac,do:action}
      }).then(function successCallback(response) {
-      getdevice();
+      //getdevice();
       console.log(response);
           }, function errorCallback(response) {
           console.log('get err');
@@ -323,9 +369,15 @@ app.controller('siteCtrl', function($scope, $http, $location,$window,$timeout,$i
                 url: '/getunregdevicebygateway/'
         }).then(function successCallback(response) {
                 //= JSON.parse(response);
-                         $scope.unregdevice = response.data;
-                         console.log(response);
-                }, function errorCallback(response) {
+		//	for(var i=0;i<response.data.length;i++){
+
+				if(lastunregdevice.length !=response.data.length){
+					lastunregdevice = response.data;
+					$scope.unregdevice = response.data;
+				}
+		//	}
+                         console.log(JSON.stringify(lastunregdevice));
+                }, function errorCallback(response){ 
                          $scope.unregdivice = null;
 			 console.log('get err');
                         // 请求失败执行代码

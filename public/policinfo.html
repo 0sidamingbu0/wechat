@@ -11,6 +11,7 @@
     <link href="/bootstrap.min.css"
     rel="stylesheet">
     <script src="/angular.min.js"></script>
+    <script src="/angular-cookies.js"></script>
   </head>
   
   <body ng-app="myApp" ng-controller="siteCtrl">
@@ -122,7 +123,8 @@
     <hr>
 
     <script>
-var app = angular.module('myApp', []);
+var app = angular.module('myApp', ['ngCookies']);
+
 app.config(['$locationProvider', function($locationProvider) {  
          // $locationProvider.html5Mode(true);  
          $locationProvider.html5Mode({
@@ -132,45 +134,72 @@ app.config(['$locationProvider', function($locationProvider) {
 }]);
 
 
-app.controller('siteCtrl', function($scope, $window,$http, $location) {
-	var uid = $location.search().uid;
-        console.log($location);
-        console.log('hash:'+$location.search().uid);
+app.controller('siteCtrl', function($cookieStore,$scope, $window,$http, $location) {
+	 var usercookies = $cookieStore.get("usercookies");
+    if(usercookies == 'undefined'){
+      $cookieStore.remove("usercookies");
+    }
+    var uid;
+    console.log('usercookies:'+usercookies);
+
+    var getdevice = function(){
+      $http({
+              method: 'GET',
+              url: '/getdevicebyuser/'+ uid
+      }).then(function successCallback(response) {
+              //= JSON.parse(response);
+                       $scope.device = response.data;
+     devicec = response.data;
+                       console.log(response);
+              }, function errorCallback(response) {
+                      console.log('get err');
+                      // 请求失败执行代码
+      });
+  }
+
+    if(usercookies){
+        uid = usercookies;
         $http({
                 method: 'GET',
-                url: '/getuserbyuid/' + $location.search().uid
+                url: '/getuserbyuid/' + usercookies
         }).then(function successCallback(response) {
                         $scope.name = response.data.name;
-                        console.log(response);
+                        //console.log(response);
+                        console.log('getuserbycookie : '+usercookies);
                 }, function errorCallback(response) {
                         console.log('get err');
                         // 请求失败执行代码
         });
-
-	var getdevice = function(){
+        getdevice();
+      }else{
         $http({
                 method: 'GET',
-                url: '/getdevicebyuser/'+ $location.search().uid.split('?',1)
+                url: '/getuserbycode/' + $location.search().code
         }).then(function successCallback(response) {
-                //= JSON.parse(response);
-                         $scope.device = response.data;
-			 devicec = response.data;
-                         console.log(response);
+                        $scope.name = response.data.name;
+                        console.log('getbycode: '+response.data.uid);
+                        uid = response.data.uid;
+                        getdevice();
+                        $cookieStore.put("usercookies",response.data.uid);
                 }, function errorCallback(response) {
                         console.log('get err');
                         // 请求失败执行代码
         });
-        }
-	$scope.getdevicebymac=function(x){
-		for( i of $scope.device){
-			//	console.log(i);
-	
-			if(i.mac == x){
-				//console.log(i);
-				return i;
-			}
-		}
-	}
+        
+      }
+
+  
+
+    $scope.getdevicebymac=function(x){
+  	for( i of $scope.device){
+  		//	console.log(i);
+
+  		if(i.mac == x){
+  			//console.log(i);
+  			return i;
+  		}
+  	}
+  }
 
 	$scope.geteventbymac=function(x){
 	//	console.log('device='+JSON.stringify(devicec));
@@ -252,7 +281,7 @@ app.controller('siteCtrl', function($scope, $window,$http, $location) {
 	}
 	
 
-        getdevice();
+        
 
 	$scope.addaction=function(){
 		console.log('polic'+$scope.polic);
@@ -284,7 +313,7 @@ app.controller('siteCtrl', function($scope, $window,$http, $location) {
 	$scope.gotopolic = function(){
            // 请求失败执行代码
         //      $window.history.go(-1);
-                $window.location.href="polic.html#"+uid;
+                $window.location.href="polic.html";
                 console.log("goback");
          };
 

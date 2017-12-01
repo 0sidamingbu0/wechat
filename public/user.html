@@ -11,6 +11,7 @@
     <link href="/bootstrap.min.css"
     rel="stylesheet">
     <script src="/angular.min.js"></script>
+    <script src="/angular-cookies.js"></script>
   </head>
 
   <body ng-app="myApp" ng-controller="siteCtrl">
@@ -68,28 +69,49 @@
       </div>
     </div>
 <script>
-var app = angular.module('myApp', []);
+var app = angular.module('myApp', ['ngCookies']);
 
-app.controller('siteCtrl', function($scope, $http, $location) {        
+app.controller('siteCtrl', function($cookieStore,$scope, $http, $location) {        
 	
-	console.log($location);
-        console.log('hash:'+$location.hash());
+	 var usercookies = $cookieStore.get("usercookies");
+    if(usercookies == 'undefined'){
+      $cookieStore.remove("usercookies");
+    }
+    var uid;
+    console.log('usercookies:'+usercookies);
+
+    
+
+    if(usercookies){
+        uid = usercookies;
         $http({
                 method: 'GET',
-                url: '/getuserbyuid/' + $location.hash()
+                url: '/getuserbyuid/' + usercookies
         }).then(function successCallback(response) {
                         $scope.name = response.data.name;
-                        $scope.mobile = response.data.mobile;
-                        $scope.email = response.data.email;
-                        $scope.password = response.data.password;
-                        console.log(response.data);
-			if(response.data === '未找到'){
-				$location.path("/login.html#"+$location.hash());
-			}
+                        //console.log(response);
+                        console.log('getuserbycookie : '+usercookies);
                 }, function errorCallback(response) {
                         console.log('get err');
                         // 请求失败执行代码
         });
+        //getgateway(uid);
+      }else{
+        $http({
+                method: 'GET',
+                url: '/getuserbycode/' + $location.search().code
+        }).then(function successCallback(response) {
+                        $scope.name = response.data.name;
+                        console.log('getbycode: '+response.data.uid);
+                        uid = response.data.uid;
+                       // getgateway(uid);
+                        $cookieStore.put("usercookies",response.data.uid);
+                }, function errorCallback(response) {
+                        console.log('get err');
+                        // 请求失败执行代码
+        });
+        
+      }
 	
 	$scope.save = function(){
             	console.log($scope.name);

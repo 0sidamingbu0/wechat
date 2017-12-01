@@ -6,7 +6,33 @@ var DeviceEntity = require('../models/device').DeviceEntity;
 var mqtt = require('../mqtt/mq');
 var request = require("request");
 var policService = require('./policService');
+//var token = require('./token');
 //router.use(express.query());
+var sendPost = function(url,body){
+    var options = {
+        url:  url,
+        method: "POST",
+        json: true,
+        headers: {
+            "Content-Type": "application/json; charset=UTF-8"
+        },
+        body: body
+    };     
+    console.log('send post: '+url+'|'+body);
+    request(options, function (error, response, body) {
+        if (error) {
+            //logger.error("send message to zbClient failed: " + error);
+        }
+        else {
+            console.log('send post response:'+JSON.stringify(response));
+            if (body.message === "success") {
+            }
+            else {
+                //logger.error("send message to zbClient failed. ");
+            }
+        }
+    });
+}
 
 exports.gatewayUpline = function(gmac){
 	console.log('gatewayUpline:' + gmac);
@@ -16,6 +42,7 @@ exports.gatewayUpline = function(gmac){
          return;
         }		
 	});
+    sendgatewayuplinemsg(gmac);
 };
 
 exports.gatewayDropline = function(gmac){
@@ -26,6 +53,7 @@ exports.gatewayDropline = function(gmac){
          return;
         }        
     });
+    sendgatewaydroplinemsg(gmac);
 };
 
 
@@ -33,6 +61,19 @@ exports.deviceReg = function(gmac,msg){
 	console.log('deviceReg:' + msg.mac);
     var type = msg.deviceType;    
 
+    if(msg.deviceType == 'CurtainPanel'){
+        switch(msg.resourceSum){
+            case '1':
+                type = '1_CurtainPanel';
+                break;
+            case '2':
+                type = '2_CurtainPanel';
+                break;
+            default:
+                console.log('deviceReg resourceSum err: '+msg.resourceSum);
+                break;
+        }
+    }
     if(msg.deviceType == 'N_SwitchLightPanel'){
         switch(msg.resourceSum){
             case '1':
@@ -147,11 +188,341 @@ exports.reportValue = function(gmac,msg){
 }
 //============================================================
 
-exports.sendmsg = function(action){    
-    console.log('sendCommond: '+action);
-    
-    sendPost('https://sc.ftqq.com/SCU1247T4f6d392d81bb2e29cf723e311f9bf06d5795a12c0adba.send?text='+action+'  时间'+Date.now(),action);
+var sendPost = function(url,body){
+    var options = {
+        url:  url,
+        method: "POST",
+        json: true,
+        headers: {
+            "Content-Type": "application/json; charset=UTF-8"
+        },
+        body: body
+    };     
+    console.log('send post: '+url+'|'+body);
+    request(options, function (error, response, body) {
+        if (error) {
+            //logger.error("send message to zbClient failed: " + error);
+        }
+        else {
+            console.log('send post response:'+JSON.stringify(response));
+            if (body.message === "success") {
+            }
+            else {
+                //logger.error("send message to zbClient failed. ");
+            }
+        }
+    });
 }
+Date.prototype.format = function(format) {  
+       var date = {  
+              "M+": this.getMonth() + 1,  
+              "d+": this.getDate(),  
+              "h+": this.getHours(),  
+              "m+": this.getMinutes(),  
+              "s+": this.getSeconds(),  
+              "q+": Math.floor((this.getMonth() + 3) / 3),  
+              "S+": this.getMilliseconds()  
+       };  
+       if (/(y+)/i.test(format)) {  
+              format = format.replace(RegExp.$1, (this.getFullYear() + '').substr(4 - RegExp.$1.length));  
+       }  
+       for (var k in date) {  
+              if (new RegExp("(" + k + ")").test(format)) {  
+                     format = format.replace(RegExp.$1, RegExp.$1.length == 1  
+                            ? date[k] : ("00" + date[k]).substr(("" + date[k]).length));  
+              }  
+       }  
+       return format;  
+}  
+exports.sendmsgbydevice = function(mac,action){    
+
+    GateEntity.findOne({'device.mac':mac},{'_id':0},function(err,gateway){
+    try{
+            console.log('gateway: '+gateway);
+        //temp.gateway = gateway.mac;
+       // console.log('temp:'+temp);
+        UserEntity.find({'gateway':gateway.mac},function(err,user){
+                 if(err){//查询异常
+                        console.log("getid server error")
+                 return 0;
+                }
+
+                if (user){
+                    for(var i=0;i<user.length;i++){
+                        console.log('user: '+user[i].uid);
+
+
+                        console.log('sendmsgbydevice: '+user[i].uid+'|'+JSON.stringify(action));
+                        var newDate = new Date();
+                        newDate.setTime(Date.now());
+                        var body={
+                                            
+                            "touser":user[i].uid,
+                            "template_id":"pJfLVjELC_8cbKi7GdVY7JoILt8BchOyIOPN0bFfAB4",
+                            "url":"http://yulurobot.cn/weixin/",
+                            "topcolor":"#FF0000",
+                            "data":{
+                                "first": {
+                                "value":"场景通知消息",
+                                "color":"#173177"
+                                },
+                                "keyword1":{
+                                "value":"家",
+                                "color":"#173177"
+                                },
+                                "keyword2":{
+                                "value":newDate.format('yyyy-MM-dd h:m:s'),
+                                "color":"#173177"
+                                },
+                                "keyword3":{
+                                "value":action,
+                                "color":"#173177"
+                                },            
+                                "remark":{
+                                "value":action,
+                                "color":"#173177"
+                                }
+                            }
+                        }
+
+                        sendPost('https://api.weixin.qq.com/cgi-bin/message/template/send?access_token='+global.wechattoken,body);
+                    }
+                        //gatewayService.sendmsg(user.uid,action);
+                        //return user.uid;        
+                }else{
+                        console.log('nouser: ');
+                        return false;
+                }
+            });
+    }catch(err){
+        console.log(err);
+    }   
+    }); 
+
+   
+}
+
+exports.sendmsgbygateway = function(mac,action){    
+    
+        UserEntity.find({'gateway':mac},function(err,user){
+                 if(err){//查询异常
+                        console.log("getid server error")
+                 return 0;
+                }
+
+                if (user){
+                        console.log('user: '+user);
+                        for(var i=0;i<user.length;i++){
+                            console.log('sendmsgbygateway: '+user[i].uid+'|'+JSON.stringify(action));
+                            var newDate = new Date();
+                            newDate.setTime(Date.now());
+                            var body={
+                                                
+                                "touser":user[i].uid,
+                                "template_id":"pJfLVjELC_8cbKi7GdVY7JoILt8BchOyIOPN0bFfAB4",
+                                "url":"http://yulurobot.cn/weixin/",
+                                "topcolor":"#FF0000",
+                                "data":{
+                                    "first": {
+                                    "value":"场景通知消息",
+                                    "color":"#173177"
+                                    },
+                                    "keyword1":{
+                                    "value":"家",
+                                    "color":"#173177"
+                                    },
+                                    "keyword2":{
+                                    "value":newDate.format('yyyy-MM-dd h:m:s'),
+                                    "color":"#173177"
+                                    },
+                                    "keyword3":{
+                                    "value":action,
+                                    "color":"#173177"
+                                    },            
+                                    "remark":{
+                                    "value":action,
+                                    "color":"#173177"
+                                    }
+                                }
+                            }
+
+                            sendPost('https://api.weixin.qq.com/cgi-bin/message/template/send?access_token='+global.wechattoken,body);
+                        }
+                        //gatewayService.sendmsg(user.uid,action);
+                        //return user.uid;        
+                }else{
+                        console.log('nouser: ');
+                        return false;
+                }
+            });
+
+    
+}
+
+var sendgatewaydroplinemsg = function(mac){  
+    GateEntity.find({mac:mac},{'_id':0},function(err, gateway){ //findOne({uid:req.params.uid},function(err,user){
+                 if(err){//查询异常
+                        console.log("getdevice server error")
+                        res.send("server err");
+                 return 0;
+                }
+            
+                console.log("gateway: "+JSON.stringify(gateway));
+    UserEntity.find({'gateway':mac},function(err,user){
+         if(err){//查询异常
+                console.log("getid server error")
+         return 0;
+        }
+
+        if (user){
+                console.log('user: '+user.uid);
+                //gatewayService.sendmsg(user.uid,action);
+                //return user.uid;        
+        }else{
+                console.log('nouser: ');
+                //return false;
+        }
+            
+    //console.log('sendgatewaydroplinemsg: '+user.uid);
+        for(var i=0;i<user.length;i++){
+            var newDate = new Date();
+            newDate.setTime(Date.now());
+            var body={
+                                
+                "touser":user[i].uid,
+                "template_id":"ajU0K5qNQcuoSNYQBJxvlaULf1QRUTywzREAAXlxDzE",
+                "url":"http://yulurobot.cn/weixin/",
+                "topcolor":"#FF0000",
+                "data":{
+                    "first": {
+                    "value":"网关离线消息",
+                    "color":"#173177"
+                    },
+                    "keyword1":{
+                    "value":gateway[0].name,
+                    "color":"#173177"
+                    },
+                    "keyword2":{
+                    "value":"智能网关",
+                    "color":"#173177"
+                    },   
+                    "keyword3":{
+                    "value":mac,
+                    "color":"#173177"
+                    },                   
+                    "remark":{
+                    "value":"尊敬的用户"+user[i].name+"，您的网关: "+mac+"于"+newDate.format('yyyy-MM-dd h:m:s')+"掉线了，请检查网络和供电",
+                    "color":"#173177"
+                    }
+                }
+            }
+            sendPost('https://api.weixin.qq.com/cgi-bin/message/template/send?access_token='+global.wechattoken,body);
+        }
+
+    });
+});
+    
+}
+var sendgatewayuplinemsg = function(mac){    
+    GateEntity.find({mac:mac},{'_id':0},function(err, gateway){ //findOne({uid:req.params.uid},function(err,user){
+                 if(err){//查询异常
+                        console.log("getdevice server error")
+                        res.send("server err");
+                 return;
+                }
+    
+                console.log("gateway: "+JSON.stringify(gateway));
+
+    UserEntity.find({'gateway':mac},function(err,user){
+                 if(err){//查询异常
+                        console.log("getid server error")
+                 return 0;
+                }
+
+                if (user){
+                        console.log('user: '+user.uid);
+                        //gatewayService.sendmsg(user.uid,action);
+                        //return user.uid;        
+                }else{
+                        console.log('nouser: ');
+                        return false;
+                }
+            
+    //console.log('sendgatewayuplinemsg: '+user.uid);
+        for(var i=0;i<user.length;i++){
+            var newDate = new Date();
+            newDate.setTime(Date.now());
+            var body={
+                                
+                "touser":user[i].uid,
+                "template_id":"FxPIJpCJVHtCy9BXN5ZRgEOuYl172wQ-qSaqAuLE2P4",
+                "url":"http://yulurobot.cn/weixin/",
+                "topcolor":"#FF0000",
+                "data":{
+                    "first": {
+                    "value":"网关上线消息",
+                    "color":"#173177"
+                    },
+                    "keyword1":{
+                    "value":mac,
+                    "color":"#173177"
+                    },
+                    "keyword2":{
+                    "value":newDate.format('yyyy-MM-dd h:m:s'),
+                    "color":"#173177"
+                    },                    
+                    "remark":{
+                    "value":"尊敬的用户"+user[i].name+"，您的网关 mac:"+mac+" 名称："+gateway[0].name+"上线啦~",
+                    "color":"#173177"
+                    }
+                }
+            }
+            sendPost('https://api.weixin.qq.com/cgi-bin/message/template/send?access_token='+global.wechattoken,body);
+        }
+    });
+});
+    
+}
+
+exports.sendmsgbyuid = function(uid,action){    
+    console.log('sendmsgbyuid: '+uid+'|'+JSON.stringify(action));
+    var newDate = new Date();
+    newDate.setTime(Date.now());
+    var body={
+                        
+        "touser":uid,
+        "template_id":"pJfLVjELC_8cbKi7GdVY7JoILt8BchOyIOPN0bFfAB4",
+        "url":"http://yulurobot.cn/weixin/",
+        "topcolor":"#FF0000",
+        "data":{
+            "first": {
+            "value":"场景通知消息",
+            "color":"#173177"
+            },
+            "keyword1":{
+            "value":"家",
+            "color":"#173177"
+            },
+            "keyword2":{
+            "value":newDate.format('yyyy-MM-dd h:m:s'),
+            "color":"#173177"
+            },
+            "keyword3":{
+            "value":action,
+            "color":"#173177"
+            },            
+            "remark":{
+            "value":action,
+            "color":"#173177"
+            }
+        }
+    }
+
+    sendPost('https://api.weixin.qq.com/cgi-bin/message/template/send?access_token='+global.wechattoken,body);
+}
+//var myInterval=setTimeout(start("服务启动"),5000);
+//start('启动');
+// console.log('启动: '+global.wechattoken);
 
 exports.sendCommond = function(mac,action){    
     console.log('sendCommond: '+mac+'|'+action);
@@ -240,6 +611,8 @@ exports.sendCommond = function(mac,action){
 
                                    
             }
+            if(dev.type=='2_CurtainPanel')
+                dev.resourceSum = 2;
             if(dev.type=='2_SwitchLightPanel')
                 dev.resourceSum = 2;
             if(dev.type=='3_SwitchLightPanel')
@@ -320,28 +693,4 @@ exports.permitJoin = function(gmac){
     mqtt.sendCommond(msg);
 }
 
-var sendPost = function(url,body){
-    var options = {
-        url:  url,
-        method: "POST",
-        json: true,
-        headers: {
-            "Content-Type": "application/json; charset=UTF-8"
-        },
-        body: body
-    };     
-    console.log('send post: '+url+'|'+body);
-    request(options, function (error, response, body) {
-        if (error) {
-            //logger.error("send message to zbClient failed: " + error);
-        }
-        else {
-            console.log('send post response:'+JSON.stringify(response));
-            if (body.message === "success") {
-            }
-            else {
-                //logger.error("send message to zbClient failed. ");
-            }
-        }
-    });
-}
+

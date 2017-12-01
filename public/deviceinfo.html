@@ -11,6 +11,7 @@
     <link href="/bootstrap.min.css"
     rel="stylesheet">
     <script src="/angular.min.js"></script>
+    <script src="/angular-cookies.js"></script>
   </head>
 
   <body ng-app="myApp" ng-controller="siteCtrl">
@@ -29,7 +30,12 @@
       <label class="pull-left">
         设备详情&nbsp;
       </label>
-      <div>
+      <div ng-if="!rightuser">
+        <label>
+            对不起，您没有权限查看此设备！
+          </label>
+      </div>
+      <div ng-if="rightuser">
         <b><br></b>
         <ul class="list-group">
         </ul>
@@ -84,25 +90,61 @@
       </div>
     </div>
 <script>
-var app = angular.module('myApp', []);
+var app = angular.module('myApp', ['ngCookies']);
+/*
+app.config(['$locationProvider', function($locationProvider) {  
+         // $locationProvider.html5Mode(true);  
+         $locationProvider.html5Mode({
+          enabled: true,
+          requireBase: false
+        });
+}]);
+*/
+app.controller('siteCtrl', function($cookieStore,$scope, $http, $location,$window) {
+    var usercookies = $cookieStore.get("usercookies");
+    if(usercookies == 'undefined'){
+      $cookieStore.remove("usercookies");
+    }
+    var uid;
+    $scope.rightuser = false;
+    console.log('usercookies:'+usercookies);
 
-app.controller('siteCtrl', function($scope, $http, $location,$window) {
-        console.log($location);
-        console.log('hash:'+$location.hash());
-var uid;
-$http({
+    uid = usercookies;
+    $http({
+            method: 'GET',
+            url: '/getuserbyuid/' + usercookies
+    }).then(function successCallback(response) {
+            $scope.name = response.data.name;
+            //console.log(response);
+            $http({
                 method: 'GET',
                 url: '/getdeviceinfo/'+ $location.hash().split('?',1)
-        }).then(function successCallback(response) {
-                //= JSON.parse(response);
-                         $scope.device = response.data;
-                         console.log(response);
-                }, function errorCallback(response) {
-                        console.log('get err');
-                        // 请求失败执行代码
-        });
+            }).then(function successCallback(response) {
+            //= JSON.parse(response);
+                if(response.data.uid == uid){
+                    $scope.rightuser = true;
+                    $scope.device = response.data;
+                    $scope.gateway = response.data.gateway;
+                    console.log('right user: '+response);
+                }else{
+                    $scope.rightuser = false;
+                }
+            }, function errorCallback(response) {
+                console.log('get err');
+                // 请求失败执行代码
+            });
+                console.log('getuserbycookie : '+usercookies);
+    }, function errorCallback(response) {
+                    console.log('get err');
+                    // 请求失败执行代码
+    });
+    //getdevice(uid);
+      
+
+      //====
 
 
+/*
 $http({
                 method: 'GET',
                 url: '/getgatewaybydevice/'+ $location.hash().split('?',1)
@@ -116,7 +158,7 @@ $http({
                         console.log('get err');
                         // 请求失败执行代码
         });
-
+*/
 
 	$scope.save = function(){
                 $http({
@@ -133,12 +175,10 @@ $http({
 
          };
 
-	$scope.goback2 = function(){
-           // 请求失败执行代码
-	//	$window.history.go(-1);
-		$window.location.href="device.html#"+uid;
-		console.log("goback");
-         };
+  $scope.goback2 = function(){
+      $window.location.href="device.html";
+      console.log("goback");
+  };
 
 	$scope.del = function(){
                 $http({
@@ -147,7 +187,7 @@ $http({
                 data:{'mac':$location.hash().split('?',1)}
                  }).then(function successCallback(response) {
                         console.log(response);
-			$window.location.href="device.html#"+uid;			
+			$window.location.href="device.html";			
                         }, function errorCallback(response) {
                         console.log('setdevicebymac return err');
                         // 请求失败执行代码

@@ -9,6 +9,7 @@ var gatewayService = require('./gatewayService');
 var async = require('async');
 //router.use(express.query());
 var doing = new Array();
+//gatewayService.sendmsg("系统启动");
 exports.execPolic = function(mac,event){
 	console.log('execpolic:' + mac + '|' + event);
 	PolicEntity.find({mac:mac,event:event},{'_id':0},function(err,polic){
@@ -45,7 +46,9 @@ exports.execPolic = function(mac,event){
                             } 
                         },100);
                     }else if(polic[0].do[count-1].type=="msg"){
-                        gatewayService.sendmsg(polic[0].do[count-1].action);
+                        //var uid = getuserbydevice(mac);
+                        gatewayService.sendmsgbydevice(mac,polic[0].do[count-1].action);
+                        //gatewayService.sendmsg(getuserbydevice(mac),polic[0].do[count-1].action);
                     }
 
                     if(count == j){
@@ -72,8 +75,5 @@ var find = function(mac,event){
     }
     return -1;
 }
-
-
-
 
 

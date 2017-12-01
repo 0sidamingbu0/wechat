@@ -11,6 +11,7 @@
     <link href="/bootstrap.min.css"
     rel="stylesheet">
     <script src="/angular.min.js"></script>
+    <script src="/angular-cookies.js"></script>
   </head>
 
   <body ng-app="myApp" ng-controller="siteCtrl">
@@ -30,9 +31,10 @@
         设备管理 
       </label>
       <p> 被控设备<input type="checkbox" ng-model="ctrled" ng-init="ctrled = true"> &nbsp;&nbsp; 非被控设备<input type="checkbox" ng-model="unctrled" ng-init="unctrled = false"></p>
-      <p ng-if="!device.length" align:center>您还没有设备哦</p> <!--没有笔记时显示-->
+      <p ng-if="!device.length&&rightuser" align:center>您还没有设备哦</p> 
+      <p ng-if="!rightuser" align:center>对不起，您没有权限查看此设备！</p>
       <ul class="list-group">
-        <li class="list-group-item" ng-repeat="x in device  track by $index" ng-if="(unctrled&&!x.do.length)||(ctrled&&x.do.length)">
+        <li class="list-group-item"  ng-repeat="x in device  track by $index" ng-if="(unctrled&&!x.do.length)||(ctrled&&x.do.length)">
           <div>
             {{x.name}}
             <div>
@@ -43,7 +45,7 @@
           </div>
 
           <div class="btn-group">
-            <button type="submit" class="btn btn-danger dropdown-toggle"  ng-if="x.type == '2_SwitchLightPanel'||x.type == '3_SwitchLightPanel'" ng-disabled="!x.do.length"  data-toggle="dropdown">关闭 <span class="caret"></span></button>
+            <button type="submit" class="btn btn-danger dropdown-toggle"  ng-if="x.type == '2_SwitchLightPanel'||x.type == '3_SwitchLightPanel'||x.type == '2_CurtainPanel'" ng-disabled="!x.do.length"  data-toggle="dropdown">关闭 <span class="caret"></span></button>
               <ul class="dropdown-menu">
                 <li><a ng-click="close(x,1)">1路</a></li>
                 <li><a ng-click="close(x,2)">2路</a></li>
@@ -51,13 +53,13 @@
               </ul>
           </div>
 
-          <button type="submit" class="btn btn-danger "  ng-disabled="!x.do.length" ng-if="!(x.type == '2_SwitchLightPanel'||x.type == '3_SwitchLightPanel')" ng-click="close(x,1)">关闭</button>           
+          <button type="submit" class="btn btn-danger "  ng-disabled="!x.do.length" ng-if="!(x.type == '2_SwitchLightPanel'||x.type == '3_SwitchLightPanel'||x.type=='2_CurtainPanel')" ng-click="close(x,1)">关闭</button>           
 
           
           &nbsp;&nbsp;
 
           <div class="btn-group">
-            <button type="submit"  class="btn btn-success dropdown-toggle" ng-disabled="!x.do.length" ng-if="x.type == '2_SwitchLightPanel'||x.type == '3_SwitchLightPanel'" data-toggle="dropdown">打开 <span class="caret"></span></button>
+            <button type="submit"  class="btn btn-success dropdown-toggle" ng-disabled="!x.do.length" ng-if="x.type == '2_SwitchLightPanel'||x.type == '3_SwitchLightPanel' ||x.type=='2_CurtainPanel'" data-toggle="dropdown">打开 <span class="caret"></span></button>
               <ul class="dropdown-menu">
                 <li><a ng-click="open(x,1)">1路</a></li>
                 <li><a ng-click="open(x,2)">2路</a></li>
@@ -65,9 +67,9 @@
               </ul>
           </div>
 
-          <button type="submit"  class="btn btn-success " ng-if="!(x.type == '2_SwitchLightPanel'||x.type == '3_SwitchLightPanel')" ng-disabled="!x.do.length" ng-click="open(x,1)">打开</button>                      
+          <button type="submit"  class="btn btn-success " ng-if="!(x.type == '2_SwitchLightPanel'||x.type == '3_SwitchLightPanel'||x.type=='2_CurtainPanel')" ng-disabled="!x.do.length" ng-click="open(x,1)">打开</button>                      
           &nbsp;&nbsp;
-          <a  href="deviceinfo.html#{{x.mac}}" class="btn btn-info">详情</a>
+          <button class="btn btn-info" ng-click="gotodeviceinfo(x.mac)">详情</button>
 
           <span class="badge" ng-if="x.do.length" ng-repeat="y in x.status track by $index">{{y}}</span>
         </li>
@@ -76,42 +78,115 @@
       </div>
     </div>
 <script>
-var app = angular.module('myApp', []);
+var app = angular.module('myApp', ['ngCookies']);
 
-app.controller('siteCtrl', function($scope, $http, $location,$window) {
-//	$scope.$on('locationChangeSuccess', $window.location.reload());
-        console.log($location);
-        console.log('hash:'+$location.hash());
+  
+
+app.config(['$locationProvider', function($locationProvider) {  
+         // $locationProvider.html5Mode(true);  
+         $locationProvider.html5Mode({
+          enabled: true,
+          requireBase: false
+        });
+}]);
+
+app.controller('siteCtrl',function($cookieStore,$scope,$http,$location,$window) {
+    var usercookies = $cookieStore.get("usercookies");
+    if(usercookies == 'undefined'){
+      $cookieStore.remove("usercookies");
+    }
+    var uid;
+    $scope.rightuser = false;
+    console.log('usercookies:'+usercookies);
+    console.log('$location.search().gateway:'+$location.search().gateway);
+    var getdevice = function(uid){
+      $http({
+              method: 'GET',
+              url: '/getdevicebyuser/'+ uid
+          }).then(function successCallback(response) {
+          //= JSON.parse(response);
+                 $scope.rightuser = true;
+                 $scope.device = response.data;
+                  console.log(response);
+              }, function errorCallback(response) {
+                  console.log('get err');
+                  // 请求失败执行代码
+          });
+    
+    }
+
+    var getdevicebygateway = function(gateway){
+        $http({
+            method: 'GET',
+            url: '/getdevicebygateway/'+ gateway
+        }).then(function successCallback(response) {
+        //= JSON.parse(response);
+        if(response.data[0].uid != uid){
+
+            $scope.rightuser = false;
+        }else{
+          console.log('response.data[0].uid: '+response.data[0].uid);
+            $scope.rightuser = true;
+            $scope.device = response.data;
+        }
+        console.log(response);
+        }, function errorCallback(response) {
+                console.log('get err');
+                // 请求失败执行代码
+        });
+    }
+
+    if(usercookies){
+        uid = usercookies;
         $http({
                 method: 'GET',
-                url: '/getuserbyuid/' + $location.hash()
+                url: '/getuserbyuid/' + usercookies
         }).then(function successCallback(response) {
                         $scope.name = response.data.name;
-                        console.log(response);
+                        //console.log(response);
+                        console.log('getuserbycookie : '+usercookies);
                 }, function errorCallback(response) {
                         console.log('get err');
                         // 请求失败执行代码
         });
-
-	var getdevice = function(){
-	$http({
+        if($location.search().gateway){
+           getdevicebygateway($location.search().gateway);
+        }else{
+           getdevice(uid);
+        }
+      }else{
+        $http({
                 method: 'GET',
-                url: '/getdevicebyuser/'+ $location.hash().split('?',1)
+                url: '/getuserbycode/' + $location.search().code
         }).then(function successCallback(response) {
-		//= JSON.parse(response);
-	                 $scope.device = response.data;
-			 console.log(response);
+                        $scope.name = response.data.name;
+                        console.log('getbycode: '+response.data.uid);
+                        uid = response.data.uid;
+                        if($location.search().gateway){
+                            getdevicebygateway($location.search().gateway);
+                        }else{
+                           getdevice(uid);
+                        }
+                        
+                        $cookieStore.put("usercookies",response.data.uid);
                 }, function errorCallback(response) {
                         console.log('get err');
                         // 请求失败执行代码
         });
-	}
-	getdevice();	
+        
+      }
+
+      $scope.gotodeviceinfo = function(mac){
+          $window.location.href="deviceinfo.html#"+mac;
+          console.log("gotodeviceinfo");
+      };
+
+		
 
         $scope.open = function(x,no){
                 console.log(x.mac);
                 var action = "On";
-                if(x.type == '2_SwitchLightPanel' || x.type == '3_SwitchLightPanel'){
+                if(x.type == '2_SwitchLightPanel' || x.type == '3_SwitchLightPanel' || x.type == '2_CurtainPanel'){
                   switch(no){
                     case 1:action = '1On';break;
                     case 2:action = '2On';break;
@@ -123,7 +198,7 @@ app.controller('siteCtrl', function($scope, $http, $location,$window) {
                 url: '/sendbymac/',
                 data:{mac:x.mac,do:action}
                  }).then(function successCallback(response) {
-	                getdevice();
+	                getdevice(uid);
 			console.log(response);
                         }, function errorCallback(response) {
                         console.log('get err');
@@ -133,10 +208,11 @@ app.controller('siteCtrl', function($scope, $http, $location,$window) {
 
         };
 
+
         $scope.close = function(x,no){
                 console.log(x.mac);
                 var action = "Off";
-                if(x.type == '2_SwitchLightPanel' || x.type == '3_SwitchLightPanel'){
+                if(x.type == '2_SwitchLightPanel' || x.type == '3_SwitchLightPanel' || x.type == '2_CurtainPanel'){
                   switch(no){
                     case 1:action = '1Off';break;
                     case 2:action = '2Off';break;
@@ -148,18 +224,16 @@ app.controller('siteCtrl', function($scope, $http, $location,$window) {
                 url: '/sendbymac/',
                 data:{mac:x.mac,do:action}
                  }).then(function successCallback(response) {
-                        getdevice();
+                        getdevice(uid);
                         console.log(response);
                         }, function errorCallback(response) {
                         console.log('get err');
                         // 请求失败执行代码
                         }
                 );
-
         };
-
-
-});
+}
+);
 </script>
 
   </body>

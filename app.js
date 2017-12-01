@@ -16,8 +16,34 @@ var users = require('./routes/users');
 var app = express();
 var mq = require('./mqtt/mq');  
 var UserEntity = require('./models/user').UserEntity; 
+var token = require('./service/token');
+var Promise = require("bluebird");
+var gatewayService=require('./service/gatewayService');
+
 
 mq.mqinit();
+
+
+var promise = new Promise(function(resolve, reject) {
+ if (token.gettoken()==1){
+ resolve();
+ } else {
+ reject();
+ }
+});
+
+promise.then(function() {
+ // success
+ 	console.log("token: "+global.token)
+    gatewayService.sendmsg('oZWQZwz6-YeMqo8-3OOrL3JgdXMg','云端服务启动');
+}, function() {
+ // failure
+});
+        
+
+
+
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
