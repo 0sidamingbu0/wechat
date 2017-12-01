@@ -15,7 +15,12 @@
   </head>
 
   <body ng-app="myApp" ng-controller="siteCtrl">
-
+<ol class="breadcrumb">
+    <li><a ng-click="goto('device')" class="active">设备管理</a></li>
+    <li><a ng-click="goto('polic')" >场景管理</a></li>
+    <li><a ng-click="goto('gateway')">网关管理</a></li>
+    <li><a ng-click="goto('user')" >用户管理</a></li>    
+</ol>
     <h3>
       &nbsp; &nbsp;欢迎回家，{{name}}
     </h3>
@@ -54,37 +59,37 @@
           <label class="pull-left">
             mac地址
           </label>
-          <input type="text" class="form-control" ng-model="device.mac">
+          <input type="text" class="form-control" ng-model="device.mac" ng-disabled="true">
         </div>
         <div class="form-group">
           <label class="pull-left">
             短地址
           </label>
-          <input type="text" class="form-control" ng-model="device.addr">
+          <input type="text" class="form-control" ng-model="device.addr" ng-disabled="true">
         </div>
         <div class="form-group">
           <label class="pull-left">
             注册时间
           </label>
-          <input type="text" class="form-control" ng-model = "device.creatTime">
+          <input type="text" class="form-control" ng-model = "device.creatTime" ng-disabled="true">
         </div>
         <div class="form-group">
           <label class="pull-left">
             类型
           </label>
-          <input type="text" class="form-control" ng-model = "device.chinesetype">
+          <input type="text" class="form-control" ng-model = "device.chinesetype" ng-disabled="true">
         </div>
         <div class="form-group">
           <label class="pull-left">
             所属网关
           </label>
-          <input type="text" class="form-control" ng-model = "gateway">
+          <input type="text" class="form-control" ng-model = "gateway" ng-disabled="true">
         </div>
         <button type="submit" class="btn btn-default" ng-click="goback2()" >返回</button>
         <button type="submit" class="btn btn-danger pull-right" ng-click="del()">
           删除设备
         </button>
-        <button type="submit" class="btn pull-left btn-warning" ng-click="find()">
+        <button type="submit" class="btn pull-left btn-warning" ng-click="finddevice()">
           寻找设备
         </button>
       </div>
@@ -140,7 +145,26 @@ app.controller('siteCtrl', function($cookieStore,$scope, $http, $location,$windo
     });
     //getdevice(uid);
       
+      $scope.finddevice = function(){
+      //console.log(x.mac);
+      var action = "Reverse";
+      if($scope.device.type == '2_SwitchLightPanel' || $scope.device.type == '3_SwitchLightPanel' || $scope.device.type == '2_CurtainPanel'){
+          action = '1Reverse';        
+      }
 
+      $http({
+      method: 'POST',
+      url: '/sendbymac/',
+      data:{mac:$scope.device.mac,do:action}
+       }).then(function successCallback(response) {
+        //getdevice();
+        console.log(response);
+            }, function errorCallback(response) {
+            console.log('get err');
+            // 请求失败执行代码
+            }
+      );
+      };
       //====
 
 
@@ -174,6 +198,11 @@ $http({
                         });
 
          };
+
+$scope.goto = function(name){
+          $window.location.href= name+".html";
+          console.log("goto "+name);
+      };
 
   $scope.goback2 = function(){
       $window.location.href="device.html";

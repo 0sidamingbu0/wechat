@@ -14,8 +14,13 @@
     <script src="/angular-cookies.js"></script>
   </head>
 
-  <body ng-app="myApp" ng-controller="siteCtrl">
-
+  <body ng-app="myApp" ng-controller="siteCtrl" ng-init="lastgateway={}">
+<ol class="breadcrumb">
+    <li><a ng-click="goto('device')" class="active">设备管理</a></li>
+    <li><a ng-click="goto('polic')" >场景管理</a></li>
+    <li><a ng-click="goto('gateway')">网关管理</a></li>
+    <li><a ng-click="goto('user')" >用户管理</a></li>    
+</ol>
     <h3>
       &nbsp; &nbsp;欢迎回家，{{name}}
     </h3>
@@ -25,6 +30,24 @@
     <script src="/bootstrap.min.js"
     >
     </script>
+
+<div class="modal fade" id="changenameModal" tabindex="-1" role="dialog" aria-labelledby="changenameModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="changenameModalLabel">修改别名</h4>
+            </div>
+            <div class="modal-body">          
+              <input type="text" class="form-control"  placeholder="请输入网关别名" ng-model="lastgateway.name" >
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary" ng-click = "save(lastgateway)">保存</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+</div>
 
 <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -85,7 +108,7 @@
             
 	      </div>
             <div class="modal-footer">
-		<button type="button" class="btn btn-primary" ng-click = "join(lastgateway)">开始添加</button>
+		<button type="button" class="btn btn-primary" ng-click = "adddevice(lastgateway)">开始添加</button>
                 <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
             </div>
         </div><!-- /.modal-content -->
@@ -95,6 +118,8 @@
     <div class="container text-center">
       <span class="label label-default"></span>
       <label class="pull-left">
+
+
         网关管理
       </label>
       <div>
@@ -104,7 +129,7 @@
           <li class="list-group-item" ng-repeat="x in device">
             <div>
               <div class="text-left">
-                <input type="text" class="form-control" ng-model="x.name">
+                <h4> {{x.name}}</h4>
               </div>
               <div class="text-left">
                 {{x.mac}}
@@ -121,13 +146,12 @@
             <div>
               <br>
             </div>
-            <button data-toggle="modal" data-target="#myModaladddevice" class="btn btn-success btn-xs" ng-click="adddevice(x)">添加设备</button>
-            &nbsp;
-           <button class="btn btn-success btn-xs"  ng-click="gotodevice(x.mac)" >子设备</button>
-            &nbsp;
-             <a class="btn btn-info btn-xs" ng-click="save(x)">修改别名</a>
-            &nbsp;
-            <button class="btn btn-danger btn-xs" ng-click="del(x)">删除</button>
+            <div class="btn-group">
+              <button data-toggle="modal" data-target="#myModaladddevice" class="btn btn-default " ng-click="adddevice(x)">添加设备</button>            
+              <button class="btn btn-success "  ng-click="gotodevice(x.mac)" >子设备</button>
+              <button class="btn btn-info " data-toggle="modal" data-target="#changenameModal" ng-click="changename(x)">修改别名</button>
+              <button class="btn btn-danger " ng-click="del(x)">删除</button>
+            </div>
           </li>
         </ul>
         <button data-toggle="modal" data-target="#myModal" class="btn btn-default">添加网关</button>
@@ -246,19 +270,20 @@ app.controller('siteCtrl', function($cookieStore,$scope, $http, $location,$windo
 
 	$scope.save = function(y){
         console.log(y);
-                $http({
-                method: 'POST',
-                url: '/setgatewaybymac/',
-                data:{'mac':y.mac,'name':y.name}
-                 }).then(function successCallback(response) {
-                        console.log(response);
-                        }, function errorCallback(response) {
-                        console.log('setgatewaybymac return err');
-                        // 请求失败执行代码
+        $http({
+        method: 'POST',
+        url: '/setgatewaybymac/',
+        data:{'mac':y.mac,'name':y.name}
+         }).then(function successCallback(response) {
+                console.log(response);
+                }, function errorCallback(response) {
+                console.log('setgatewaybymac return err');
+                // 请求失败执行代码
 
-                        });
+        }); 
+         $window.location.reload();
 
-        };
+  };
 
 	$scope.add = function(){
                 $http({
@@ -322,8 +347,19 @@ app.controller('siteCtrl', function($cookieStore,$scope, $http, $location,$windo
     );
   };
 
+  $scope.goto = function(name){
+      $window.location.href= name+".html";
+      console.log("goto "+name);
+  };
+
+  $scope.changename = function(x){
+      $scope.lastgateway = x;
+      console.log("lastgateway "+x);
+  };
+
 	$scope.adddevice = function(x){
 		lastgateway = x;
+    $scope.lastgateway = x;
 		getdevice(x);
     
     $http({

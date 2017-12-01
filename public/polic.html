@@ -15,6 +15,13 @@
   </head>
   
   <body ng-app="myApp" ng-controller="siteCtrl">
+  <ol class="breadcrumb">
+    <li><a ng-click="goto('device')" class="active">设备管理</a></li>
+    <li><a ng-click="goto('polic')" >场景管理</a></li>
+    <li><a ng-click="goto('gateway')">网关管理</a></li>
+    <li><a ng-click="goto('user')" >用户管理</a></li>    
+</ol>
+
     <h3>
       &nbsp; &nbsp;欢迎回家，{{name}}
     </h3>
@@ -140,6 +147,11 @@ app.controller('siteCtrl', function($cookieStore,$window,$scope, $http, $locatio
         
       }
 
+$scope.goto = function(name){
+          $window.location.href= name+".html";
+          console.log("goto "+name);
+      };
+      
     $scope.gotopolicinfo = function(mac,event){
         $window.location.href="policinfo.html?mac="+mac+"&event="+event;
         console.log("gotopolicinfo");

@@ -15,6 +15,13 @@
   </head>
   
   <body ng-app="myApp" ng-controller="siteCtrl">
+  <ol class="breadcrumb">
+    <li><a ng-click="goto('device')" class="active">设备管理</a></li>
+    <li><a ng-click="goto('polic')" >场景管理</a></li>
+    <li><a ng-click="goto('gateway')">网关管理</a></li>
+    <li><a ng-click="goto('user')" >用户管理</a></li>    
+</ol>
+
     <h3>
       &nbsp; &nbsp;欢迎回家，{{name}}
     </h3>
@@ -40,7 +47,7 @@
         <label class="pull-left">
           场景名称
         </label>
-        <input type="text" class="form-control" ng-model="polic.name">
+        <input type="text" class="form-control" ng-model="polic.name" placeholder="请输入场景名称">
       </div>
       <hr>
       <div class="form-group">
@@ -50,7 +57,7 @@
           如果：
         </label>
         <select class="form-control" ng-if="!dis" ng-model="polic.mac" ng-options="x.mac as (x.name+'('+x.chinesetype+')') for x in device">
-          <option value="" >设备</option>        
+          <option value="" >触发场景的设备</option>        
         </select>
 	<input type="text" class="form-control" ng-if="dis && device" ng-disabled="true" value="{{getdevicebymac(polic.mac).name}}({{getdevicebymac(polic.mac).chinesetype}})">
       </div>
@@ -59,7 +66,7 @@
           触发:
         </label>
         <select class="form-control" ng-if="!dis && device" ng-model="polic.event" ng-options="y.value as y.name for y in geteventbymac(polic.mac)">
-          <option value="" >事件</option>
+          <option value="" >触发场景的事件</option>
         </select>
 	<input type="text" class="form-control" ng-if="dis && device" ng-disabled="true" value="{{geteventname(polic.mac,polic.event)}}">
       </div>
@@ -81,7 +88,7 @@
           <tr ng-repeat="x in polic.do">
             <td ng-if="x.type=='device'||!x.type">
               <select class="form-control"  ng-model="polic.do[$index].mac" ng-options="y.mac as (y.name+'('+y.chinesetype+')') for y in device">
-                <option value="">设备</option>
+                <option value="">执行动作的设备</option>
               </select>
             </td>            
             <td ng-if="x.type=='device'||!x.type">
@@ -93,7 +100,7 @@
             </td>
             <td ng-if="x.type=='delay'">
               <select  class="form-control" ng-model="polic.do[$index].action" ng-options="y.value as y.name for y in timelist">
-                <option value="">时间</option>
+                <option value="">延时时间</option>
               </select>
             </td>
 	          <td ng-if="x.type=='delay'">
@@ -116,7 +123,7 @@
       <button type="submit" ng-click="gotopolic()" class="btn btn-default pull-left btn-sm">
         返回
       </button>
-      <button  type="submit" class="btn pull-right btn-success btn-sm" ng-click="report()">
+      <button type="submit" class="btn pull-right btn-success btn-sm" ng-click="report()">
         保存
       </button>
     </div>
@@ -190,6 +197,11 @@ app.controller('siteCtrl', function($cookieStore,$scope, $window,$http, $locatio
 
   
 
+$scope.goto = function(name){
+          $window.location.href= name+".html";
+          console.log("goto "+name);
+      };
+      
     $scope.getdevicebymac=function(x){
   	for( i of $scope.device){
   		//	console.log(i);
@@ -310,12 +322,10 @@ app.controller('siteCtrl', function($cookieStore,$scope, $window,$http, $locatio
 		{'name':'5分','value':'300'}
 	];
 
-	$scope.gotopolic = function(){
-           // 请求失败执行代码
-        //      $window.history.go(-1);
-                $window.location.href="polic.html";
-                console.log("goback");
-         };
+  $scope.gotopolic = function(){
+        $window.location.href="polic.html";
+        console.log("goback");
+  };
 
 
 	$scope.report=function(){
