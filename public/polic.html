@@ -16,7 +16,7 @@
   
   <body ng-app="myApp" ng-controller="siteCtrl">
     <h3>
-      &nbsp; &nbsp;欢迎回家，{{user.name}}
+      &nbsp; &nbsp;欢迎回家，{{name}}
     </h3>
     <script src="/jquery.min.js"
     >
@@ -48,9 +48,9 @@
       </ul>
       <div class="btn-group">
       </div>
-      <a href="policinfo.html?uid={{user.uid}}"  type="submit" class="btn pull-right btn-primary btn-xs">
+      <button type="submit" ng-click="creatpolic()" class="btn pull-right btn-primary btn-xs">
         添加场景
-      </a>
+      </button>
       <ul class="list-group">
       </ul>
       <p ng-if="!polic.length" align:center>您还没有场景哦</p>
@@ -60,9 +60,9 @@
             删除
           </button>
 
-          <a href="policinfo.html?uid={{user.uid}}&mac={{x.mac}}&event={{x.event}}" type="submit" class="btn pull-right btn-xs btn-default">
+          <button  type="submit" ng-click="gotopolicinfo(x.mac,x.event)" class="btn pull-right btn-xs btn-default">
             编辑
-          </a>
+          </button>
           {{x.name}}
         </li>
       </ul>
@@ -140,7 +140,16 @@ app.controller('siteCtrl', function($cookieStore,$window,$scope, $http, $locatio
         
       }
 
-        
+    $scope.gotopolicinfo = function(mac,event){
+        $window.location.href="policinfo.html?mac="+mac+"&event="+event;
+        console.log("gotopolicinfo");
+    };
+
+    $scope.creatpolic = function(){
+        $window.location.href="policinfo.html";
+        console.log("creatpolic");
+    };
+
 
 	$scope.delpolic = function(x){
         $http({
