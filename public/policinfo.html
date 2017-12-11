@@ -7,6 +7,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
     <title>
+    场景详情
     </title>
     <link href="/bootstrap.min.css"
     rel="stylesheet">
@@ -15,12 +16,121 @@
   </head>
   
   <body ng-app="myApp" ng-controller="siteCtrl">
-  <ol class="breadcrumb">
-    <li><a ng-click="goto('device')" class="active">设备管理</a></li>
-    <li><a ng-click="goto('polic')" >场景管理</a></li>
-    <li><a ng-click="goto('gateway')">网关管理</a></li>
-    <li><a ng-click="goto('user')" >用户管理</a></li>    
-</ol>
+
+    <div class="modal fade" id="advanceEventModal" tabindex="-1" role="dialog" aria-labelledby="advanceEventModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                  <h4 class="modal-title" id="advanceEventModalLabel">如果同时满足</h4>
+              </div>
+              <div class="modal-body">   
+                <table class="table" style="vertical-align: middle !important;text-align: center;">
+                  <tbody>                      
+                      <tr ng-repeat="x in polic.do[advanceIndex].advanceEvent.event">
+                        <td ng-if="x.type=='device'">                             
+                        <div class="form-group">                    
+                          <select class="form-control"  ng-model="polic.do[advanceIndex].advanceEvent.event[$index].mac" ng-options="x.mac as (x.name+' - ('+x.chinesetype+')') for x in advanceEventDevice">
+                            <option value="" >设备</option>        
+                          </select>                    
+                        </div>
+                        </td>
+                        <td ng-if="x.type=='device'">
+                          <div class="form-group">                  
+                            <select class="form-control"  ng-model="polic.do[advanceIndex].advanceEvent.event[$index].event" ng-options="y.value as y.name for y in getDeviceByMac(polic.do[advanceIndex].advanceEvent.event[$index].mac).advanceEvent">
+                              <option value="" >事件</option>
+                            </select>            
+                          </div>
+                        </td>  
+                        <td ng-if="x.type=='device'">
+                          <div class="form-group">                  
+                            <select class="form-control" ng-model="polic.do[advanceIndex].advanceEvent.event[$index].time" ng-options="y.value as y.name for y in advanceTimeList">
+                              <option value="" >时间</option>
+                            </select>            
+                          </div>
+                        </td>  
+
+                        <td ng-if="x.type=='time'">                             
+                        <div class="form-group">                    
+                          <select class="form-control"  ng-model="polic.do[advanceIndex].advanceEvent.event[$index].start" ng-options="x.value as (x.name) for x in startstop">
+                            <option value="" >开始</option>        
+                          </select>                    
+                        </div>
+                        </td>
+                        <td ng-if="x.type=='time'">
+                          <div class="form-group">                  
+                            <select class="form-control"  ng-model="polic.do[advanceIndex].advanceEvent.event[$index].stop" ng-options="x.value as (x.name) for x in startstop">
+                              <option value="" >结束</option>
+                            </select>            
+                          </div>
+                        </td>  
+                        <td ng-if="x.type=='time'">
+                          
+                        </td> 
+
+                        <td style="vertical-align: middle !important;text-align: center;">
+                          <div class="form-group">                  
+                            <a href="#" class="btn btn-xs btn-danger pull-right" type="submit" ng-click="polic.do[advanceIndex].advanceEvent.event.splice($index,1)">删除</a>            
+                          </div>
+                        </td>      
+                                           
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              <div class="modal-footer">
+                  <button type="button" class="btn btn-default" ng-click="addAdvanceEventListTime(advanceIndex)">添加时间段</button>
+                  <button type="button" class="btn btn-default" ng-click="addAdvanceEventList(advanceIndex)">添加</button>
+                  <button type="button" class="btn btn-default" data-dismiss="modal">继续</button>                  
+              </div>
+          </div><!-- /.modal-content -->
+      </div><!-- /.modal -->
+    </div>
+
+    <div class="modal fade" id="advanceDoModal" tabindex="-1" role="dialog" aria-labelledby="advanceDoModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="advanceDoModalLabel">那么会执行</h4>
+                </div>
+                <div class="modal-body">   
+                  <table class="table" style="vertical-align: middle !important;text-align: center;">
+                    <tbody>                                             
+                      <tr ng-repeat="x in polic.do[advanceIndex].advanceEvent.do">
+                        <td>
+                          <select class="form-control"  ng-model="polic.do[advanceIndex].advanceEvent.do[$index].mac" ng-options="y.mac as (y.name+' - ('+y.chinesetype+')') for y in dodevice">
+                            <option value="">执行动作的设备</option>
+                          </select>
+                        </td>            
+                        <td>
+                          <select  class="form-control" ng-if="device"  ng-model="polic.do[advanceIndex].advanceEvent.do[$index].action" ng-options="y.value as y.name for y in getdobymac(polic.do[advanceIndex].advanceEvent.do[$index].mac)">
+                            <option value="">动作</option>
+                          </select>
+                        </td> 
+                        <td style="vertical-align: middle !important;text-align: center;">
+                          <div class="form-group">                  
+                            <a href="#" class="btn btn-xs btn-danger pull-right" type="submit" ng-click="polic.do[advanceIndex].advanceEvent.do.splice($index,1)">删除</a>            
+                          </div>
+                        </td>                                            
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" ng-click="addAdvanceDoList(advanceIndex)">添加</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">继续</button>                    
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal -->
+      </div>
+
+    <ol class="breadcrumb">
+      <li><a ng-click="goto('device')" class="active">设备管理</a></li>
+      <li><a ng-click="goto('polic')" >场景管理</a></li>
+      <li><a ng-click="goto('gateway')">网关管理</a></li>
+      <li><a ng-click="goto('user')" >用户管理</a></li>    
+    </ol>
 
     <h3>
       &nbsp; &nbsp;欢迎回家，{{name}}
@@ -28,9 +138,8 @@
     <script src="/jquery.min.js"
     >
     </script>
-    <script src="/bootstrap.min.js"
-    >
-    </script>
+    <script src="/bootstrap.min.js"></script>
+    <script src="/bootstrap-slider.min.js"></script>
     <div class="container text-center">
       <span class="label label-default"></span>
       <label class="pull-left">
@@ -53,10 +162,13 @@
       <div class="form-group">
       </div>
       <div class="form-group">
+      
+    
+
         <label class="pull-left">
           如果：
         </label>
-        <select class="form-control" ng-if="!dis" ng-model="polic.mac" ng-options="x.mac as (x.name+'('+x.chinesetype+')') for x in device">
+        <select class="form-control" ng-if="!dis" ng-model="polic.mac" ng-options="x.mac as (x.name+' - ('+x.chinesetype+')') for x in eventdevice">
           <option value="" >触发场景的设备</option>        
         </select>
 	<input type="text" class="form-control" ng-if="dis && device" ng-disabled="true" value="{{getdevicebymac(polic.mac).name}}({{getdevicebymac(polic.mac).chinesetype}})">
@@ -78,16 +190,18 @@
       </ul>
       <ul class="list-group">
       </ul>
-      <div class="btn-group">
-        <a href="#" type="submit" class="btn btn-xs btn-info" ng-click="addaction()">添加动作</a>
-        <a href="#" type="submit" class="btn btn-xs btn-primary" ng-click="adddelay()">添加延时</a>
-        <a href="#" type="submit" class="btn btn-xs btn-default" ng-click="addmsg(x)">添加通知</a>
+      <div class="btn-group">        
+        <button  type="submit" class="btn btn-default btn-sm" ng-click="addadvanceAction()">添加高级动作</button>
+        <button  type="submit" class="btn btn-default btn-sm" ng-click="addaction()">添加动作</button>
+        <button  type="submit" class="btn btn-default btn-sm" ng-click="adddelay()">添加延时</button>
+        <button  type="submit" class="btn btn-default btn-sm" ng-click="addmsg(x)">添加通知</button>
       </div>
+      <p></p>
       <table class="table" style="vertical-align: middle !important;text-align: center;">
         <tbody>
           <tr ng-repeat="x in polic.do">
             <td ng-if="x.type=='device'||!x.type">
-              <select class="form-control"  ng-model="polic.do[$index].mac" ng-options="y.mac as (y.name+'('+y.chinesetype+')') for y in device">
+              <select class="form-control"  ng-model="polic.do[$index].mac" ng-options="y.mac as (y.name+' - ('+y.chinesetype+')') for y in dodevice">
                 <option value="">执行动作的设备</option>
               </select>
             </td>            
@@ -103,8 +217,25 @@
                 <option value="">延时时间</option>
               </select>
             </td>
+
+            <td ng-if="x.type=='timeCondition'">
+              <select  class="form-control" ng-model="polic.do[$index].action" ng-options="y.value as y.name for y in timelist">
+                <option value="">延时时间</option>
+              </select>
+            </td>
+
 	          <td ng-if="x.type=='delay'">
             </td>
+
+
+            <td ng-if="x.type =='advanceAction'">
+              <a href="#" class="btn btn-sm btn-success pull-left" type="submit"  data-toggle="modal" ng-click="changeAdvanceIndex($index)" data-target="#advanceEventModal">高级动作满足...</a>
+            </td>
+
+            <td ng-if="x.type =='advanceAction'">
+              <a href="#" class="btn btn-sm btn-success pull-left" type="submit"  data-toggle="modal" ng-click="changeAdvanceIndex($index)" data-target="#advanceDoModal">高级动作执行...</a>
+            </td>
+
 
             <td ng-if="x.type =='msg'">
               消息：
@@ -120,12 +251,21 @@
         </tbody>
       </table>
       <hr>
-      <button type="submit" ng-click="gotopolic()" class="btn btn-default pull-left btn-sm">
-        返回
-      </button>
-      <button type="submit" class="btn pull-right btn-success btn-sm" ng-click="report()">
-        保存
-      </button>
+      <table class="table" style="vertical-align: middle !important;text-align: center;">
+        <tr>
+          <td>
+            <button type="submit" ng-click="gotopolic()" class="btn btn-default btn-sm">
+              返回
+            </button>
+          </td>
+        
+          <td>
+            <button type="submit" class="btn btn-success btn-sm" ng-click="report()">
+              保存
+            </button>
+          </td>
+        </tr>
+      </table>
     </div>
     <hr>
 
@@ -143,6 +283,12 @@ app.config(['$locationProvider', function($locationProvider) {
 
 app.controller('siteCtrl', function($cookieStore,$scope, $window,$http, $location) {
 	 var usercookies = $cookieStore.get("usercookies");
+
+   $scope.eventdevice = [];
+   $scope.dodevice=[];
+   $scope.advanceEventDevice=[];
+   $scope.advanceDoDevice=[];
+
     if(usercookies == 'undefined'){
       $cookieStore.remove("usercookies");
     }
@@ -155,7 +301,28 @@ app.controller('siteCtrl', function($cookieStore,$scope, $window,$http, $locatio
               url: '/getdevicebyuser/'+ uid
       }).then(function successCallback(response) {
               //= JSON.parse(response);
-                       $scope.device = response.data;
+              $scope.device = response.data;
+              for(var i =0;i<response.data.length;i++){
+                console.log('response.data:'+i+": "+JSON.stringify(response.data[i]));
+                  try{
+                      if(response.data[i].event.length){
+                         $scope.eventdevice.push(response.data[i]);
+                      }
+                      if(response.data[i].do.length){
+                         $scope.dodevice.push(response.data[i]);
+                      }
+                      if(response.data[i].advanceEvent.length){
+                          console.log("advanceEventDevice: "+JSON.stringify(response.data[i]));
+                         $scope.advanceEventDevice.push(response.data[i]);
+                      }
+                      if(response.data[i].advanceDo.length){
+                         $scope.advanceDoDevice.push(response.data[i]);
+                      }
+                  }catch(err){
+                    console.log("for err: "+err);
+                  }
+              }
+                      
      devicec = response.data;
                        console.log(response);
               }, function errorCallback(response) {
@@ -201,7 +368,7 @@ $scope.goto = function(name){
           $window.location.href= name+".html";
           console.log("goto "+name);
       };
-      
+
     $scope.getdevicebymac=function(x){
   	for( i of $scope.device){
   		//	console.log(i);
@@ -211,6 +378,19 @@ $scope.goto = function(name){
   			return i;
   		}
   	}
+  }
+
+  $scope.getDeviceByMac=function(x){
+  //  console.log('device='+JSON.stringify(devicec));
+  //  console.log('length='+devicec.lenght);
+    for( i of $scope.device){
+      //  console.log(i);
+  
+      if(i.mac == x){
+        //console.log(i);
+        return i;
+      }
+    }
   }
 
 	$scope.geteventbymac=function(x){
@@ -286,33 +466,56 @@ $scope.goto = function(name){
 			'type':'device',
 			'mac':'',
 			'event':'',
-			'do':[{'action':'','value':''}],
+			'do':[{'action':'','value':'','type':'','mac':'','advanceEvent':{'event':[{'type':'device'}],'do':[{}]}}],      
 			'name':''
 		}
 		//$scope.polic.push(temp);
 	}
 	
+  $scope.addAdvanceEventList=function(x){
+      console.log('polic:'+$scope.polic);
+      //var temp = {"type":"advanceAction"}
+      $scope.polic.do[x].advanceEvent.event.push({'type':'device'});
+  }  
 
-        
+  $scope.addAdvanceEventListTime=function(x){
+      console.log('polic:'+$scope.polic);
+      //var temp = {"type":"advanceAction"}
+      $scope.polic.do[x].advanceEvent.event.push({'type':'time','start':'','stop':''});
+  }
 
+  $scope.addAdvanceDoList=function(x){
+      console.log('polic:'+$scope.polic);
+      //var temp = {"type":"advanceAction"}
+      $scope.polic.do[x].advanceEvent.do.push({});
+  }   
+  $scope.changeAdvanceIndex=function(index){
+    //console.log('polic'+$scope.polic);
+    $scope.advanceIndex = index;
+  }
 	$scope.addaction=function(){
 		console.log('polic'+$scope.polic);
 		$scope.polic.do.push({});
 	}
+  $scope.addadvanceAction=function(){
+      console.log('polic:'+$scope.polic);
+      var temp = {'action':'','value':'','type':'advanceAction','mac':'','advanceEvent':{'event':[{'type':'device'}],'do':[{}]}};
+      $scope.polic.do.push(temp);
+  }  
 	
 
   $scope.addmsg=function(x){
-                console.log('polic:'+$scope.polic);
-    var temp = {"type":"msg","action":x}
-                $scope.polic.do.push(temp);
+      console.log('polic:'+$scope.polic);
+      var temp = {"type":"msg","action":x}
+      $scope.polic.do.push(temp);
   }
   
 
 	$scope.adddelay=function(){
-                console.log('polic:'+$scope.polic);
-		var temp = {"type":"delay"}
-                $scope.polic.do.push(temp);
-        }
+      console.log('polic:'+$scope.polic);
+      var temp = {"type":"delay"}
+      $scope.polic.do.push(temp);
+  }
 
 	$scope.timelist=[
 		{'name':'1秒','value':'1'},
@@ -321,6 +524,77 @@ $scope.goto = function(name){
 		{'name':'1分','value':'60'},
 		{'name':'5分','value':'300'}
 	];
+  $scope.advanceTimeList=[
+    {'name':'立即','value':{'data':'0','tyep':'normal'}},
+    {'name':'1秒内','value':{'data':'1','tyep':'normal'}},
+    {'name':'5秒内','value':{'data':'5','tyep':'normal'}},
+    {'name':'30秒内','value':{'data':'30','tyep':'normal'}},
+    {'name':'1分内','value':{'data':'60','tyep':'normal'}},
+    {'name':'5分内','value':{'data':'300','tyep':'normal'}},
+    {'name':'30分内','value':{'data':'1800','tyep':'normal'}},
+    {'name':'1小时内','value':{'data':'3600','tyep':'normal'}},
+    {'name':'3小时内','value':{'data':'10800','tyep':'normal'}},
+    {'name':'1秒后','value':{'data':'1','tyep':'defer'}},
+    {'name':'5秒后','value':{'data':'5','tyep':'defer'}},
+    {'name':'30秒后','value':{'data':'30','tyep':'defer'}},
+    {'name':'1分后','value':{'data':'60','tyep':'defer'}},
+    {'name':'5分后','value':{'data':'300','tyep':'defer'}},
+    {'name':'30分后','value':{'data':'1800','tyep':'defer'}},
+    {'name':'1小时后','value':{'data':'3600','tyep':'defer'}},
+    {'name':'3小时后','value':{'data':'10800','tyep':'defer'}}
+  ];
+  $scope.startstop=[
+    {'name':'0点','value':'0'},
+    {'name':'0点30分','value':'0.5'},
+    {'name':'1点','value':'1'},
+    {'name':'1点30分','value':'1.5'},
+    {'name':'2点','value':'2'},
+    {'name':'2点30分','value':'2.5'},
+    {'name':'3点','value':'3'},
+    {'name':'3点30分','value':'3.5'},
+    {'name':'4点','value':'4'},
+    {'name':'4点30分','value':'4.5'},
+    {'name':'5点','value':'5'},
+    {'name':'5点30分','value':'5.5'},
+    {'name':'6点','value':'6'},
+    {'name':'6点30分','value':'6.5'},
+    {'name':'7点','value':'7'},
+    {'name':'7点30分','value':'7.5'},
+    {'name':'8点','value':'8'},
+    {'name':'8点30分','value':'8.5'},
+    {'name':'9点','value':'9'},
+    {'name':'9点30分','value':'9.5'},
+    {'name':'10点','value':'10'},
+    {'name':'10点30分','value':'10.5'},
+    {'name':'11点','value':'11'},
+    {'name':'11点30分','value':'11.5'},
+    {'name':'12点','value':'12'},
+    {'name':'12点30分','value':'12.5'},
+    {'name':'13点','value':'13'},
+    {'name':'13点30分','value':'13.5'},
+    {'name':'14点','value':'14'},
+    {'name':'14点30分','value':'14.5'},
+    {'name':'15点','value':'15'},
+    {'name':'15点30分','value':'15.5'},
+    {'name':'16点','value':'16'},
+    {'name':'16点30分','value':'16.5'},
+    {'name':'17点','value':'17'},
+    {'name':'17点30分','value':'17.5'},
+    {'name':'18点','value':'18'},
+    {'name':'18点30分','value':'18.5'},
+    {'name':'19点','value':'19'},
+    {'name':'19点30分','value':'19.5'},
+    {'name':'20点','value':'20'},
+    {'name':'20点30分','value':'20.5'},
+    {'name':'21点','value':'21'},
+    {'name':'21点30分','value':'21.5'},
+    {'name':'22点','value':'22'},
+    {'name':'22点30分','value':'22.5'},
+    {'name':'23点','value':'23'},
+    {'name':'23点30分','value':'23.5'},
+    
+  ];
+
 
   $scope.gotopolic = function(){
         $window.location.href="polic.html";

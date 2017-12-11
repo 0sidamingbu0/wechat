@@ -28,6 +28,212 @@ router.use('/sendbymac/',function(req,res){
     res.send('ok');
 });
 
+var packetDevice = function(device){
+    var tempdev = JSON.parse(JSON.stringify(device));
+    switch(tempdev.type){
+         case '1_CurtainPanel':
+            console.log('is 1curtainpanel');
+            tempdev.event={
+            };            
+            tempdev.do = [ 
+                {name:'打开',value:'On'},
+                {name:'关闭',value:'Off'},
+                {name:'反转',value:'Reverse'},
+            ];
+            tempdev.advanceEvent = [ 
+                {name:'打开',value:'On'},
+                {name:'关闭',value:'Off'}                                        
+            ];
+            tempdev.chinesetype='1路窗帘';
+            break;
+         case '2_CurtainPanel':
+            console.log('is 2curtainpanel');
+            tempdev.event={
+            };
+            tempdev.do = [ 
+            {name:'1路打开',value:'1On'},
+            {name:'1路关闭',value:'1Off'},
+            {name:'1路反转',value:'1Reverse'},
+            {name:'2路打开',value:'2On'},
+            {name:'2路关闭',value:'2Off'},
+            {name:'2路反转',value:'2Reverse'}
+            ];            
+            tempdev.advanceEvent = [ 
+                {name:'1路打开',value:'1On'},
+                {name:'1路关闭',value:'1Off'},
+                {name:'2路打开',value:'2On'},
+                {name:'2路关闭',value:'2Off'}                                        
+            ];
+            tempdev.chinesetype='2路窗帘';
+            break;
+
+        case 'MiButton':
+            console.log('is mibutton');
+            tempdev.event=[
+                {name:'按下',value:'PressDown'},
+                {name:'释放',value:'PressUp'},
+                {name:'双击',value:'DoubleClick'}
+            ];
+            tempdev.do = {
+                };
+            tempdev.advanceEvent=[
+                {name:'按下',value:'PressDown'},
+                {name:'释放',value:'PressUp'},
+                {name:'双击',value:'DoubleClick'}
+            ];            
+            tempdev.chinesetype='小米按钮';
+        break;
+
+        case '1_SwitchLightPanel':
+            console.log('is 1switch');
+            tempdev.event=[
+                {name:'按下',value:'PressDown'},
+                {name:'释放',value:'PressUp'}
+            ];
+            tempdev.do=[
+                {name:'打开',value:'On'},
+                {name:'关闭',value:'Off'},
+                {name:'反转',value:'Reverse'}
+            ];            
+            tempdev.advanceEvent=[
+                {name:'打开',value:'On'},
+                {name:'关闭',value:'Off'}                                        
+            ];
+            tempdev.chinesetype='1路开关';
+        break;
+        case '2_SwitchLightPanel':
+                console.log('is 2switch');
+                tempdev.event=[
+                        {name:'1路按下',value:'1PressDown'},
+                        {name:'1路释放',value:'1PressUp'},
+                        {name:'2路按下',value:'2PressDown'},
+                        {name:'2路释放',value:'2PressUp'}
+                ];
+                tempdev.do=[
+                        {name:'1路打开',value:'1On'},
+                        {name:'1路关闭',value:'1Off'},
+                        {name:'1路反转',value:'1Reverse'},
+                        {name:'2路打开',value:'2On'},
+                        {name:'2路关闭',value:'2Off'},
+                        {name:'2路反转',value:'2Reverse'}
+                ];                
+                tempdev.advanceEvent=[
+                    {name:'1路打开',value:'1On'},
+                    {name:'1路关闭',value:'1Off'},                                        
+                    {name:'2路打开',value:'2On'},
+                    {name:'2路关闭',value:'2Off'}                                                                
+                ];
+                tempdev.chinesetype='2路开关';
+        break;
+        case '3_SwitchLightPanel':
+                console.log('is 3switch');
+                tempdev.event=[
+                        {name:'1路按下',value:'1PressDown'},
+                        {name:'1路释放',value:'1PressUp'},
+                        {name:'2路按下',value:'2PressDown'},
+                        {name:'2路释放',value:'2PressUp'},
+                        {name:'3路按下',value:'3PressDown'},
+                        {name:'3路释放',value:'3PressUp'}
+                ];
+                tempdev.do=[
+                        {name:'1路打开',value:'1On'},
+                        {name:'1路关闭',value:'1Off'},
+                        {name:'1路反转',value:'1Reverse'},
+                        {name:'2路打开',value:'2On'},
+                        {name:'2路关闭',value:'2Off'},
+                        {name:'2路反转',value:'2Reverse'},
+                        {name:'3路打开',value:'3On'},
+                        {name:'3路关闭',value:'3Off'},
+                        {name:'3路反转',value:'3Reverse'}
+                ];                
+                tempdev.advanceEvent=[
+                    {name:'1路打开',value:'1On'},
+                    {name:'1路关闭',value:'1Off'},                                        
+                    {name:'2路打开',value:'2On'},
+                    {name:'2路关闭',value:'2Off'},
+                    {name:'3路打开',value:'3On'},
+                    {name:'3路关闭',value:'3Off'}                                                                
+                ];
+                tempdev.chinesetype='3路开关';
+        break;
+
+        case 'PowerPanel':
+                console.log('is powerpanel');
+                tempdev.event=[
+                        {name:'按下',value:'PressDown'},
+                        {name:'释放',value:'PressUp'}
+                ];
+                tempdev.do=[
+                        {name:'打开',value:'On'},
+                        {name:'关闭',value:'Off'},
+                        {name:'反转',value:'Reverse'}
+                ];                
+                tempdev.advanceEvent=[
+                    {name:'打开',value:'On'},
+                    {name:'关闭',value:'Off'}                                                                                                                                           
+                ];
+                tempdev.chinesetype='插座';
+        break;
+        case 'PowerPanel_Mi':
+                console.log('is powerpanelMi');
+                tempdev.event={};
+                tempdev.do=[
+                        {name:'打开',value:'On'},
+                        {name:'关闭',value:'Off'},
+                        {name:'反转',value:'Reverse'}
+                ];                
+                tempdev.advanceEvent=[
+                    {name:'打开',value:'On'},
+                    {name:'关闭',value:'Off'}                                                                                                                                           
+                ];
+                tempdev.chinesetype='小米插座';
+        break;
+        case 'BodySensor':
+                console.log('is bodysensor');
+                tempdev.event=[
+                    {name:'人体移动',value:'BodyMove'} 
+                ];
+                tempdev.do=[
+                ];
+                tempdev.advanceEvent=[
+                    {name:'人体移动',value:'BodyMove'},
+                    {name:'没有人体移动',value:'NoBodyMove'}                                            
+                ];                
+                tempdev.chinesetype='人体感应';
+        break;
+        case 'MagnetSensor':
+                console.log('is magnetsensor');
+                tempdev.event=[
+                    {name:'关门',value:'PressDown'},
+                    {name:'开门',value:'PressUp'}
+                ];
+                tempdev.do=[
+                ];
+                tempdev.advanceEvent=[
+                    {name:'关门',value:'PressDown'},
+                    {name:'开门',value:'PressUp'}                                           
+                ];                
+                tempdev.chinesetype='门窗传感器';
+        break;
+        case 'TemperatureSensor':
+                console.log('is TemperatureSensor');
+                tempdev.event=[
+                        {name:'温度',value:'Temperature'},
+                        {name:'湿度',value:'Humidity'}
+                ];
+                tempdev.do=[
+                ];
+                tempdev.advanceEvent=[
+                    {name:'温度',value:'Temperature'},
+                    {name:'湿度',value:'Humidity'}                                         
+                ];                
+                tempdev.chinesetype='温湿度传感器';
+        break;
+
+    }
+    return tempdev;
+}
+
 router.get('/getuserbycode/:code',function(req,res){
     var options = {            
         url:  "https://api.weixin.qq.com/sns/oauth2/access_token?appid=wx6debf35e8f567884&secret=04976556b89bbffefe738f5ee068e72f&code="+req.params.code+"&grant_type=authorization_code",
@@ -62,9 +268,10 @@ router.get('/getuserbycode/:code',function(req,res){
 
                         if (user){//手机号已注册
                                 console.log("getcode user:" + getres.openid + ' user:'+ user.name)
-                    res.send(user);
+                                res.send(user);
                         }else{
-                    res.send('未找到');
+                                var temp ={"status":"failed","type":"nouser","uid":getres.openid};
+                                res.send(temp);
                 }
             });
         }
@@ -83,9 +290,10 @@ router.get('/getuserbyuid/:uid',function(req,res){
 
                 if (user){//手机号已注册
                         console.log("getuserbyuid find:" + req.params.uid + ' user:'+ user.name)
-			res.send(user);
+			             res.send(user);
                 }else{
-			res.send('未找到');
+			              var temp ={"status":"failed","type":"nouser","uid":req.params.uid};
+                          res.send(temp);
 		}
 	});
 
@@ -165,7 +373,7 @@ router.use('/setpolicbymac/',function(req,res){
 
 
 router.use('/setuserbyuid/',function(req,res){
-        UserEntity.update({uid:req.body.uid[0]}, {email:req.body.email,mobile:req.body.mobile,password:req.body.password,name:req.body.name},{upsert:true},  function(err, result){ //findOne({uid:req.params.uid},function(err,user){
+        UserEntity.update({uid:req.body.uid}, {email:req.body.email,mobile:req.body.mobile,password:req.body.password,name:req.body.name},{upsert:true},  function(err, result){ //findOne({uid:req.params.uid},function(err,user){
                  if(err){//查询异常
                         console.log("getid server error")
 			res.send("server err");
@@ -180,7 +388,7 @@ router.use('/setuserbyuid/',function(req,res){
 });
 
 router.use('/addgatewaybyuid/',function(req,res){
-        UserEntity.update({uid:req.body.uid[0]}, {'$push':{'gateway':req.body.mac}},{upsert:true},  function(err, result){ //findOne({uid:req.params.uid},function(err,user){
+        UserEntity.update({uid:req.body.uid}, {'$push':{'gateway':req.body.mac}},{upsert:true},  function(err, result){ //findOne({uid:req.params.uid},function(err,user){
                 console.log('err1:'+err); 
 		if(err){//查询异常
                         console.log("add gateway server error")
@@ -196,14 +404,14 @@ router.use('/addgatewaybyuid/',function(req,res){
 			return;
                 }
 	});
-        console.log("update result:" + req.body.uid[0])
+        console.log("update result:" + req.body.uid)
         res.send("ok");
 
 
 });
 
 router.use('/removegatewaybyuid/',function(req,res){
-        UserEntity.update({uid:req.body.uid[0]}, {'$pull':{'gateway':req.body.mac}},  function(err, result){ //findOne({uid:req.params.uid},function(err,user){
+        UserEntity.update({uid:req.body.uid}, {'$pull':{'gateway':req.body.mac}},  function(err, result){ //findOne({uid:req.params.uid},function(err,user){
                 console.log('err1:'+err);
                 if(err){//查询异常
                         console.log("add gateway server error")
@@ -219,7 +427,7 @@ router.use('/removegatewaybyuid/',function(req,res){
                         return;
                 }
         });
-        console.log("update result:" + req.body.uid[0])
+        console.log("update result:" + req.body.uid)
         res.send("ok");
 
 
@@ -423,157 +631,8 @@ router.use('/getdevicebycode/:code',function(req,res){
                     var temp=new Array();
                 
                     for(var i=0 ;i<device.length ;i++){
-                        for(var j =0;j<device[i].device.length;j++){
-                            var tempdev = JSON.parse(JSON.stringify(device[i].device[j]));
-                            switch(tempdev.type){
-                                 case '1_CurtainPanel':
-                                                                console.log('is 1curtainpanel');
-                                                                tempdev.event={
-                                                                };
-                                                                tempdev.do = [ 
-                                                {name:'打开',value:'On'},
-                                                {name:'关闭',value:'Off'},
-                                                {name:'反转',value:'Reverse'},
-                                                                ];
-                                                                tempdev.chinesetype='1路窗帘';
-                                                        break;
-                                 case '2_CurtainPanel':
-                                                                console.log('is 2curtainpanel');
-                                                                tempdev.event={
-                                                                };
-                                                                tempdev.do = [ 
-                                                {name:'1路打开',value:'1On'},
-                                                {name:'1路关闭',value:'1Off'},
-                                                {name:'1路反转',value:'1Reverse'},
-                                                {name:'2路打开',value:'2On'},
-                                                {name:'2路关闭',value:'2Off'},
-                                                {name:'2路反转',value:'2Reverse'}
-                                                                ];
-                                                                tempdev.chinesetype='2路窗帘';
-                                                        break;
-
-                                case 'MiButton':
-                                    console.log('is mibutton');
-                                    tempdev.event=[
-                                        {name:'按下',value:'PressDown'},
-                                        {name:'释放',value:'PressUp'},
-                                        {name:'双击',value:'DoubleClick'}
-                                    ];
-                                    tempdev.do = {
-                                        };
-                                    tempdev.chinesetype='小米按钮';
-                                break;
-
-                                case '1_SwitchLightPanel':
-                                    console.log('is 1switch');
-                                    tempdev.event=[
-                                        {name:'按下',value:'PressDown'},
-                                        {name:'释放',value:'PressUp'}
-                                    ];
-                                    tempdev.do=[
-                                        {name:'打开',value:'On'},
-                                        {name:'关闭',value:'Off'},
-                                        {name:'反转',value:'Reverse'}
-                                    ];
-                                    tempdev.chinesetype='1路开关';
-                                break;
-                                case '2_SwitchLightPanel':
-                                        console.log('is 2switch');
-                                        tempdev.event=[
-                                                {name:'1路按下',value:'1PressDown'},
-                                                {name:'1路释放',value:'1PressUp'},
-                                                {name:'2路按下',value:'2PressDown'},
-                                                {name:'2路释放',value:'2PressUp'}
-                                        ];
-                                        tempdev.do=[
-                                                {name:'1路打开',value:'1On'},
-                                                {name:'1路关闭',value:'1Off'},
-                                                {name:'1路反转',value:'1Reverse'},
-                                                {name:'2路打开',value:'2On'},
-                                                {name:'2路关闭',value:'2Off'},
-                                                {name:'2路反转',value:'2Reverse'}
-                                        ];
-                                        tempdev.chinesetype='2路开关';
-                                break;
-                                case '3_SwitchLightPanel':
-                                        console.log('is 3switch');
-                                        tempdev.event=[
-                                                {name:'1路按下',value:'1PressDown'},
-                                                {name:'1路释放',value:'1PressUp'},
-                                                {name:'2路按下',value:'2PressDown'},
-                                                {name:'2路释放',value:'2PressUp'},
-                                                {name:'3路按下',value:'3PressDown'},
-                                                {name:'3路释放',value:'3PressUp'}
-                                        ];
-                                        tempdev.do=[
-                                                {name:'1路打开',value:'1On'},
-                                                {name:'1路关闭',value:'1Off'},
-                                                {name:'1路反转',value:'1Reverse'},
-                                                {name:'2路打开',value:'2On'},
-                                                {name:'2路关闭',value:'2Off'},
-                                                {name:'2路反转',value:'2Reverse'},
-                                                {name:'3路打开',value:'3On'},
-                                                {name:'3路关闭',value:'3Off'},
-                                                {name:'3路反转',value:'3Reverse'}
-                                        ];
-                                        tempdev.chinesetype='3路开关';
-                                break;
-
-                                case 'PowerPanel':
-                                        console.log('is powerpanel');
-                                        tempdev.event=[
-                                                {name:'按下',value:'PressDown'},
-                                                {name:'释放',value:'PressUp'}
-                                        ];
-                                        tempdev.do=[
-                                                {name:'打开',value:'On'},
-                                                {name:'关闭',value:'Off'},
-                                                {name:'反转',value:'Reverse'}
-                                        ];
-                                        tempdev.chinesetype='插座';
-                                break;
-                                case 'PowerPanel_Mi':
-                                        console.log('is powerpanelMi');
-                                        tempdev.event={};
-                                        tempdev.do=[
-                                                {name:'打开',value:'On'},
-                                                {name:'关闭',value:'Off'},
-                                                {name:'反转',value:'Reverse'}
-                                        ];
-                                        tempdev.chinesetype='小米插座';
-                                break;
-                                case 'BodySensor':
-                                        console.log('is bodysensor');
-                                        tempdev.event=[
-                                                {name:'人体移动',value:'BodyMove'},
-                                        ];
-                                        tempdev.do=[
-                                        ];
-                                        tempdev.chinesetype='人体感应';
-                                break;
-                                case 'MagnetSensor':
-                                        console.log('is magnetsensor');
-                                        tempdev.event=[
-                                            {name:'关门',value:'PressDown'},
-                                            {name:'开门',value:'PressUp'}
-                                        ];
-                                        tempdev.do=[
-                                        ];
-                                        tempdev.chinesetype='门窗传感器';
-                                break;
-                                case 'TemperatureSensor':
-                                        console.log('is TemperatureSensor');
-                                        tempdev.event=[
-                                                {name:'温度',value:'Temperature'},
-                                                {name:'湿度',value:'Humidity'}
-                                        ];
-                                        tempdev.do=[
-                                        ];
-                                        tempdev.chinesetype='温湿度传感器';
-                                break;
-
-                            }
-                            temp.push(tempdev);
+                        for(var j =0;j<device[i].device.length;j++){                            
+                            temp.push(packetDevice(device[i].device[j]));
                                                 
                         }
                             
@@ -632,157 +691,7 @@ router.use('/getdevicebyuser/:uid',function(req,res){
 		
 			for(var i=0 ;i<device.length ;i++){
 				for(var j =0;j<device[i].device.length;j++){
-					var tempdev = JSON.parse(JSON.stringify(device[i].device[j]));
-					switch(tempdev.type){
-						 case '1_CurtainPanel':
-                                                        console.log('is 1curtainpanel');
-                                                        tempdev.event={
-                                                        };
-                                                        tempdev.do = [ 
-                                        {name:'打开',value:'On'},
-                                        {name:'关闭',value:'Off'},
-                                        {name:'反转',value:'Reverse'},
-                                                        ];
-                                                        tempdev.chinesetype='1路窗帘';
-                                                break;
-						 case '2_CurtainPanel':
-                                                        console.log('is 2curtainpanel');
-                                                        tempdev.event={
-                                                        };
-                                                        tempdev.do = [ 
-                                        {name:'1路打开',value:'1On'},
-                                        {name:'1路关闭',value:'1Off'},
-                                        {name:'1路反转',value:'1Reverse'},
-                                        {name:'2路打开',value:'2On'},
-                                        {name:'2路关闭',value:'2Off'},
-                                        {name:'2路反转',value:'2Reverse'}
-                                                        ];
-                                                        tempdev.chinesetype='2路窗帘';
-                                                break;
-
-						case 'MiButton':
-							console.log('is mibutton');
-							tempdev.event=[
-								{name:'按下',value:'PressDown'},
-								{name:'释放',value:'PressUp'},
-								{name:'双击',value:'DoubleClick'}
-							];
-							tempdev.do = {
-      							};
-							tempdev.chinesetype='小米按钮';
-						break;
-
-						case '1_SwitchLightPanel':
-							console.log('is 1switch');
-							tempdev.event=[
-								{name:'按下',value:'PressDown'},
-								{name:'释放',value:'PressUp'}
-							];
-							tempdev.do=[
-								{name:'打开',value:'On'},
-								{name:'关闭',value:'Off'},
-								{name:'反转',value:'Reverse'}
-							];
-							tempdev.chinesetype='1路开关';
-						break;
-                        case '2_SwitchLightPanel':
-                                console.log('is 2switch');
-                                tempdev.event=[
-                                        {name:'1路按下',value:'1PressDown'},
-                                        {name:'1路释放',value:'1PressUp'},
-                                        {name:'2路按下',value:'2PressDown'},
-                                        {name:'2路释放',value:'2PressUp'}
-                                ];
-                                tempdev.do=[
-                                        {name:'1路打开',value:'1On'},
-                                        {name:'1路关闭',value:'1Off'},
-                                        {name:'1路反转',value:'1Reverse'},
-                                        {name:'2路打开',value:'2On'},
-                                        {name:'2路关闭',value:'2Off'},
-                                        {name:'2路反转',value:'2Reverse'}
-                                ];
-                                tempdev.chinesetype='2路开关';
-                        break;
-                        case '3_SwitchLightPanel':
-                                console.log('is 3switch');
-                                tempdev.event=[
-                                        {name:'1路按下',value:'1PressDown'},
-                                        {name:'1路释放',value:'1PressUp'},
-                                        {name:'2路按下',value:'2PressDown'},
-                                        {name:'2路释放',value:'2PressUp'},
-                                        {name:'3路按下',value:'3PressDown'},
-                                        {name:'3路释放',value:'3PressUp'}
-                                ];
-                                tempdev.do=[
-                                        {name:'1路打开',value:'1On'},
-                                        {name:'1路关闭',value:'1Off'},
-                                        {name:'1路反转',value:'1Reverse'},
-                                        {name:'2路打开',value:'2On'},
-                                        {name:'2路关闭',value:'2Off'},
-                                        {name:'2路反转',value:'2Reverse'},
-                                        {name:'3路打开',value:'3On'},
-                                        {name:'3路关闭',value:'3Off'},
-                                        {name:'3路反转',value:'3Reverse'}
-                                ];
-                                tempdev.chinesetype='3路开关';
-                        break;
-
-                        case 'PowerPanel':
-                                console.log('is powerpanel');
-                                tempdev.event=[
-                                        {name:'按下',value:'PressDown'},
-                                        {name:'释放',value:'PressUp'}
-                                ];
-                                tempdev.do=[
-                                        {name:'打开',value:'On'},
-                                        {name:'关闭',value:'Off'},
-                                        {name:'反转',value:'Reverse'}
-                                ];
-                                tempdev.chinesetype='插座';
-                        break;
-                        case 'PowerPanel_Mi':
-                                console.log('is powerpanelMi');
-                                tempdev.event={};
-                                tempdev.do=[
-                                        {name:'打开',value:'On'},
-                                        {name:'关闭',value:'Off'},
-                                        {name:'反转',value:'Reverse'}
-                                ];
-                                tempdev.chinesetype='小米插座';
-                        break;
-                        case 'BodySensor':
-                                console.log('is bodysensor');
-                                tempdev.event=[
-                                        {name:'人体移动',value:'BodyMove'},
-                                ];
-                                tempdev.do=[
-                                ];
-                                tempdev.chinesetype='人体感应';
-                        break;
-                        case 'MagnetSensor':
-                                console.log('is magnetsensor');
-                                tempdev.event=[
-    								{name:'关门',value:'PressDown'},
-    								{name:'开门',value:'PressUp'}
-                                ];
-                                tempdev.do=[
-                                ];
-                                tempdev.chinesetype='门窗传感器';
-                        break;
-                        case 'TemperatureSensor':
-                                console.log('is TemperatureSensor');
-                                tempdev.event=[
-                                        {name:'温度',value:'Temperature'},
-                                        {name:'湿度',value:'Humidity'}
-                                ];
-                                tempdev.do=[
-                                ];
-                                tempdev.chinesetype='温湿度传感器';
-                        break;
-
-					}
-					temp.push(tempdev);
-										
+					temp.push(packetDevice(device[i].device[j]));									
 				}
 					
 			}
@@ -830,155 +739,7 @@ router.use('/getdevicebygateway/:mac',function(req,res){
 			var temp = new Array();
 			for(var i=0 ;i<device.length ;i++){
                 for(var j =0;j<device[i].device.length;j++){
-                    var tempdev = JSON.parse(JSON.stringify(device[i].device[j]));
-                    switch(tempdev.type){
-						 case '1_CurtainPanel':
-                                                        console.log('is 1curtainpanel');
-                                                        tempdev.event={
-                                                        };
-                                                        tempdev.do = [ 
-                                        {name:'打开',value:'On'},
-                                        {name:'关闭',value:'Off'},
-                                        {name:'反转',value:'Reverse'},
-                                                        ];
-                                                        tempdev.chinesetype='1路窗帘';
-                                                break;
-						 case '2_CurtainPanel':
-                                                        console.log('is 2curtainpanel');
-                                                        tempdev.event={
-                                                        };
-                                                        tempdev.do = [ 
-                                        {name:'1路打开',value:'1On'},
-                                        {name:'1路关闭',value:'1Off'},
-                                        {name:'1路反转',value:'1Reverse'},
-                                        {name:'2路打开',value:'2On'},
-                                        {name:'2路关闭',value:'2Off'},
-                                        {name:'2路反转',value:'2Reverse'}
-                                                        ];
-                                                        tempdev.chinesetype='2路窗帘';
-                                                break;
-                        case 'MiButton':
-                            console.log('is mibutton');
-                            tempdev.event=[
-                                {name:'按下',value:'PressDown'},
-                                {name:'释放',value:'PressUp'},
-                                {name:'双击',value:'DoubleClick'}
-                            ];
-                            tempdev.do = {
-                                };
-                            tempdev.chinesetype='小米按钮';
-                        break;
-                        case '1_SwitchLightPanel':
-                            console.log('is 1switch');
-                            tempdev.event=[
-                                {name:'按下',value:'PressDown'},
-                                {name:'释放',value:'PressUp'}
-                            ];
-                            tempdev.do=[
-                                {name:'打开',value:'On'},
-                                {name:'关闭',value:'Off'},
-                                {name:'反转',value:'Reverse'}
-                            ];
-                            tempdev.chinesetype='1路开关';
-                        break;
-                        case '2_SwitchLightPanel':
-                                console.log('is 2switch');
-                                tempdev.event=[
-                                        {name:'1路按下',value:'1PressDown'},
-                                        {name:'1路释放',value:'1PressUp'},
-                                        {name:'2路按下',value:'2PressDown'},
-                                        {name:'2路释放',value:'2PressUp'}
-                                ];
-                                tempdev.do=[
-                                        {name:'1路打开',value:'1On'},
-                                        {name:'1路关闭',value:'1Off'},
-                                        {name:'1路反转',value:'1Reverse'},
-                                        {name:'2路打开',value:'2On'},
-                                        {name:'2路关闭',value:'2Off'},
-                                        {name:'2路反转',value:'2Reverse'}
-                                ];
-                                tempdev.chinesetype='2路开关';
-                        break;
-                        case '3_SwitchLightPanel':
-                                console.log('is 3switch');
-                                tempdev.event=[
-                                        {name:'1路按下',value:'1PressDown'},
-                                        {name:'1路释放',value:'1PressUp'},
-                                        {name:'2路按下',value:'2PressDown'},
-                                        {name:'2路释放',value:'2PressUp'},
-                                        {name:'3路按下',value:'3PressDown'},
-                                        {name:'3路释放',value:'3PressUp'}
-                                ];
-                                tempdev.do=[
-                                        {name:'1路打开',value:'1On'},
-                                        {name:'1路关闭',value:'1Off'},
-                                        {name:'1路反转',value:'1Reverse'},
-                                        {name:'2路打开',value:'2On'},
-                                        {name:'2路关闭',value:'2Off'},
-                                        {name:'2路反转',value:'2Reverse'},
-                                        {name:'3路打开',value:'3On'},
-                                        {name:'3路关闭',value:'3Off'},
-                                        {name:'3路反转',value:'3Reverse'}
-                                ];
-                                tempdev.chinesetype='3路开关';
-                        break;
-
-                        case 'PowerPanel':
-                                console.log('is powerpanel');
-                                tempdev.event=[
-                                        {name:'按下',value:'PressDown'},
-                                        {name:'释放',value:'PressUp'}
-                                ];
-                                tempdev.do=[
-                                        {name:'打开',value:'On'},
-                                        {name:'关闭',value:'Off'},
-                                        {name:'反转',value:'Reverse'}
-                                ];
-                                tempdev.chinesetype='插座';
-                        break;
-                        case 'PowerPanel_Mi':
-                                console.log('is powerpanelMi');
-                                tempdev.event={};
-                                tempdev.do=[
-                                        {name:'打开',value:'On'},
-                                        {name:'关闭',value:'Off'},
-                                        {name:'反转',value:'Reverse'}
-                                ];
-                                tempdev.chinesetype='小米插座';
-                        break;
-                        case 'BodySensor':
-                                console.log('is bodysensor');
-                                tempdev.event=[
-                                        {name:'人体移动',value:'BodyMove'},
-                                ];
-                                tempdev.do=[
-                                ];
-                                tempdev.chinesetype='人体感应';
-                        break;
-                        case 'MagnetSensor':
-                                console.log('is magnetsensor');
-                                tempdev.event=[
-                                    {name:'关门',value:'PressDown'},
-                                    {name:'开门',value:'PressUp'}
-                                ];
-                                tempdev.do=[
-                                ];
-                                tempdev.chinesetype='门窗传感器';
-                        break;
-                        case 'TemperatureSensor':
-                                console.log('is TemperatureSensor');
-                                tempdev.event=[
-                                        {name:'温度',value:'Temperature'},
-                                        {name:'湿度',value:'Humidity'}
-                                ];
-                                tempdev.do=[
-                                ];
-                                tempdev.chinesetype='温湿度传感器';
-                        break;
-
-                    }
-                    temp.push(tempdev);
-                                        
+                    temp.push(packetDevice(device[i].device[j]));                                                            
                 }
                     
             }
@@ -1231,6 +992,7 @@ router.get('/',  function(req, res, next) {
 });
 router.use('/', wechat(config, function(req, res, next) {
         var message = req.weixin;
+        console.log("wechat : " + JSON.stringify(message));
         //文本
 	if(message.Event === 'CLICK' ){
 		UserEntity.findOne({uid:message.FromUserName},function(err,user){
@@ -1270,12 +1032,16 @@ router.use('/', wechat(config, function(req, res, next) {
 				return;
 	        	}
 		});
-	}
-
-        else if(message.MsgType === 'text'){
-                console.log('send to ' + message.FromUserName + '留言已收到~谢谢');
-                res.reply('留言已收到~谢谢');
-        }
+	}        
+    else if(message.MsgType === 'text'){
+            console.log('send to ' + message.FromUserName + '留言已收到~谢谢');
+            res.reply('留言已收到~谢谢');
+    }
+    else if(message.Event === 'subscribe'){
+            console.log('send to ' + message.FromUserName + '欢迎来到您的未来家居，请点击本条消息完善个人信息');
+            res.reply('欢迎来到您的未来家居，请点击 "菜单" -> "用户信息" 完善您的个人信息，然后按照小T操作指南添加小T~ 尽情享受吧!');
+    }
+    //wechat : {"ToUserName":"gh_2856522bb84c","FromUserName":"oZWQZw8mzd_hyoKltq5Z-YRGwV1g","CreateTime":"1512980085","MsgType":"event","Event":"subscribe","EventKey":""}
 
 }));
 

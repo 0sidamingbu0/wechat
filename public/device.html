@@ -7,6 +7,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
     <title>
+    设备管理
     </title>
     <link href="/bootstrap.min.css"
     rel="stylesheet">
@@ -152,9 +153,13 @@ app.controller('siteCtrl',function($cookieStore,$scope,$http,$location,$window) 
                 method: 'GET',
                 url: '/getuserbyuid/' + usercookies
         }).then(function successCallback(response) {
-                        $scope.name = response.data.name;
-                        //console.log(response);
-                        console.log('getuserbycookie : '+usercookies);
+                        if(response.data.type=='nouser'){                            
+                            $window.location.href= "user.html";
+                        }else{ 
+                            $scope.name = response.data.name;
+                            //console.log(response);
+                            console.log('getuserbycookie : '+usercookies);
+                        }
                 }, function errorCallback(response) {
                         console.log('get err');
                         // 请求失败执行代码
@@ -169,16 +174,22 @@ app.controller('siteCtrl',function($cookieStore,$scope,$http,$location,$window) 
                 method: 'GET',
                 url: '/getuserbycode/' + $location.search().code
         }).then(function successCallback(response) {
-                        $scope.name = response.data.name;
-                        console.log('getbycode: '+response.data.uid);
-                        uid = response.data.uid;
-                        if($location.search().gateway){
-                            getdevicebygateway($location.search().gateway);
-                        }else{
-                           getdevice(uid);
+                        if(response.data.type=='nouser'){
+                            $cookieStore.put("usercookies",response.data.uid);
+                            $window.location.href= "user.html";
+
+                        }else{                          
+                            $scope.name = response.data.name;
+                            console.log('getbycode: '+response.data.uid);
+                            uid = response.data.uid;
+                            if($location.search().gateway){
+                                getdevicebygateway($location.search().gateway);
+                            }else{
+                               getdevice(uid);
+                            }
+                            
+                            $cookieStore.put("usercookies",response.data.uid);
                         }
-                        
-                        $cookieStore.put("usercookies",response.data.uid);
                 }, function errorCallback(response) {
                         console.log('get err');
                         // 请求失败执行代码
