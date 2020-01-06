@@ -26,7 +26,7 @@ exports.mqinit = function(){
  **/
 	MqttServer.on('published', function(packet, client) {
 	    	var topic = packet.topic;
-	   	 console.log('message-arrived--->','topic ='+topic+',message = '+ packet.payload);
+	   	 console.log(packet.payload);
 		//console.log("packet: "+JSON.stringify(packet));		
 		//console.log("client: "+JSON.stringify(client));
 		try{

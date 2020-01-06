@@ -13,6 +13,10 @@ var GateScheme =new base.Schema({
 		addr:{type:Number},
 		online:{type:Boolean},
 		status:[String],
+		event:[{
+			event:{type:String},
+	        lastTime:{type:Date,default:Date.now}			
+		}],
 		name:{type:String,default:'未命名'},
 		registered:{type:Boolean,default:false}
 	}],

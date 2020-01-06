@@ -34,6 +34,45 @@ var sendPost = function(url,body){
     });
 }
 
+var updateDeviceEventRecord = function(mac,event){
+    console.log('updateDeviceEventRecord:' + mac +'|'+event);
+
+    var dev;
+    var index = 1;
+    var time = new Date();
+    //newDate.setTime(Date.now());
+    GateEntity.find({'device.mac':mac},{device:{'$elemMatch':{mac:mac}} },function(err, device){ //findOne({uid:req.params.uid},function(err,user){
+        if(err){//查询异常
+            console.log("getDeviceEventLastTime server error")                        
+            return false;
+        }
+        console.log("device[0] "+ JSON.stringify(device[0]));
+        if(device[0]){
+            //console.log("device[0] "+ device[0]);
+             dev = JSON.parse(JSON.stringify(device[0].device[0]));
+            //dev.gatewayMac = device[0].mac;
+            var found = false;
+            for(var i=0;i<dev.event.length;i++){
+                if(dev.event[i].event == event){
+                    dev.event[i].event.lastTime = Date.now();  
+                    found = true;                  
+                }
+            } 
+            if(!found){
+                dev.event.push({'event':event,'lastTime':Date.now()});
+            }   
+
+            GateEntity.update({"device.mac":mac},{$set:{'device.$.online':true,'device.$.lastTime':Date.now(),'device.$.event':dev.event}},{upsert:true},function(err,res){
+                if(err){
+                    console.log(err);
+                    return;
+               }                
+            });        
+        }
+    });
+   
+};
+
 exports.gatewayUpline = function(gmac){
 	console.log('gatewayUpline:' + gmac);
 	GateEntity.update({mac:gmac},{online:true,mac:gmac,lastTime:Date.now(),createTime:Date.now()},{upsert:true},function(err,gateway){
@@ -149,6 +188,7 @@ exports.reportStatus = function(gmac,msg){
 
 exports.reportEvent = function(gmac,msg){
     console.log('reportEvent: '+msg.mac+'|'+msg.event);
+    updateDeviceEventRecord(msg.mac,msg.event);
     policService.execPolic(msg.mac,msg.event);
 }
 
@@ -523,6 +563,36 @@ exports.sendmsgbyuid = function(uid,action){
 //var myInterval=setTimeout(start("服务启动"),5000);
 //start('启动');
 // console.log('启动: '+global.wechattoken);
+// 
+exports.getDeviceEventLastTime = function(mac,event){    
+    console.log('getDeviceEventLastTime: '+mac+'|'+event);
+    var dev;
+    var index = 1;
+    var time = new Date();
+    //newDate.setTime(Date.now());
+    GateEntity.find({'device.mac':mac},{device:{'$elemMatch':{mac:mac}} },function(err, device){ //findOne({uid:req.params.uid},function(err,user){
+        if(err){//查询异常
+            console.log("getDeviceEventLastTime server error")                        
+            return false;
+        }
+        console.log("device[0] "+ JSON.stringify(device[0]));
+        if(device[0]){
+            //console.log("device[0] "+ device[0]);
+             dev = JSON.parse(JSON.stringify(device[0].device[0]));
+            //dev.gatewayMac = device[0].mac;
+            for(var i=0;i<dev.event.length;i++){
+                if(dev.event[i].event == event){
+                    time.setTime(dev.lastTime);
+                    return time;
+                }
+            }
+            //time.setTime(dev.lastTime);
+            return false;
+        }
+    });
+}
+
+
 
 exports.sendCommond = function(mac,action){    
     console.log('sendCommond: '+mac+'|'+action);

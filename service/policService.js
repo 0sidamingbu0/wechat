@@ -7,9 +7,17 @@ var PolicEntity = require('../models/polic').PolicEntity;
 var mqtt = require('../mqtt/mq');
 var gatewayService = require('./gatewayService');
 var async = require('async');
+var Q = require('q');
 //router.use(express.query());
 var doing = new Array();
 //gatewayService.sendmsg("系统启动");
+
+function myDelay(ms){ // 定义延时操作，返回promise
+    var deferred = Q.defer() ;
+    setTimeout(deferred.resolve , ms);
+    return deferred.promise;
+}
+
 exports.execPolic = function(mac,event){
 	console.log('execpolic:' + mac + '|' + event);
 	PolicEntity.find({mac:mac,event:event},{'_id':0},function(err,polic){
@@ -49,7 +57,46 @@ exports.execPolic = function(mac,event){
                         //var uid = getuserbydevice(mac);
                         gatewayService.sendmsgbydevice(mac,polic[0].do[count-1].action);
                         //gatewayService.sendmsg(getuserbydevice(mac),polic[0].do[count-1].action);
+                    }else if(polic[0].do[count-1].type=="advanceAction"){
+                        var doit = true;
+                        for(var i=0;i<polic[0].do[count-1].event.length;i++){
+                            switch(polic[0].do[count-1].advanceEvent.event[i].type){
+                                case 'device':
+                                    if(polic[0].do[count-1].advanceEvent.event[i].time.type=='normal'){                                        
+                                        var eventTime = gatewayService.getDeviceEventLastTime(polic[0].do[count-1].advanceEvent.event[i].mac,polic[0].do[count-1].advanceEvent.event[i].event);
+                                        var now = new Date();
+                                        newDate.setTime(Date.now());
+                                        if(now - eventTime <= polic[0].do[count-1].advanceEvent.event[i].time.value*1000){
+                                            break;
+                                        }                                        
+                                    }else if(polic[0].do[count-1].advanceEvent.event[i].time.type=='defer'){
+
+                                        break;
+                                    }
+                                    
+                                    doit = false;
+                                    break;
+                                case 'time':
+                                    var now = new Date();
+                                    newDate.setTime(Date.now());
+                                    var hour = now.getHours();
+                                    var min = now.getMinutes();
+                                    if(hour >= parseInt(polic[0].do[count-1].advanceEvent.event[i].start) && hour <= parseInt(polic[0].do[count-1].advanceEvent.event[i].stop)){
+                                        break;
+                                    }
+                                    doit = false;
+                                    break;
+                            }
+                        }
+                        
+
+                        if(doit == true){
+                            for(var i=0;i<polic[0].do[count-1].advanceEvent.do.length;i++){
+                                gatewayService.sendCommond(polic[0].do[count-1].advanceEvent.do[i].mac,polic[0].do[count-1].advanceEvent.do[i].action);
+                            }
+                        }
                     }
+                      
 
                     if(count == j){
                         doing.splice(find(mac,event),1);

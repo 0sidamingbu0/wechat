@@ -1,15 +1,29 @@
 var base = require('./base');  
 var ObjectId = base.ObjectId;  
 var PolicScheme =new base.Schema({  
-    	mac:String,
+    mac:String,
 	event:String,
 	lastTime:{type:Date,default:Date.now},//最后登陆时间  
     	createTime:{type:Date,default:Date.now},//创建时间  
 	name:String,
  	do:[{
 		mac:{type:String},
-                type:{type:String,default:'device'},
-		action:{type:String}
+        type:{type:String,default:'device'},
+		action:{type:String},
+		advanceEvent:{
+			event:[{
+				mac:{type:String},
+				event:{type:String},
+				time:{type:{type:String},value:{type:String}},
+				start:{type:String},
+		        type:{type:String,default:'device'},
+				stop:{type:String}			
+			}],
+			do:[{
+				mac:{type:String},		        
+				action:{type:String}				
+			}]
+		}
 	}]
   
   

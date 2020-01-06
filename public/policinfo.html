@@ -42,7 +42,7 @@
                             </select>            
                           </div>
                         </td>  
-                        <td ng-if="x.type=='device'">
+                        <td ng-if="x.type=='device' && getdevicebymac(polic.do[advanceIndex].advanceEvent.event[$index].mac).type == 'MiButton'||getdevicebymac(polic.do[advanceIndex].advanceEvent.event[$index].mac).type == 'MagnetSensor'||getdevicebymac(polic.do[advanceIndex].advanceEvent.event[$index].mac).type == 'BodySensor'">
                           <div class="form-group">                  
                             <select class="form-control" ng-model="polic.do[advanceIndex].advanceEvent.event[$index].time" ng-options="y.value as y.name for y in advanceTimeList">
                               <option value="" >时间</option>
@@ -525,23 +525,23 @@ $scope.goto = function(name){
 		{'name':'5分','value':'300'}
 	];
   $scope.advanceTimeList=[
-    {'name':'立即','value':{'data':'0','tyep':'normal'}},
-    {'name':'1秒内','value':{'data':'1','tyep':'normal'}},
-    {'name':'5秒内','value':{'data':'5','tyep':'normal'}},
-    {'name':'30秒内','value':{'data':'30','tyep':'normal'}},
-    {'name':'1分内','value':{'data':'60','tyep':'normal'}},
-    {'name':'5分内','value':{'data':'300','tyep':'normal'}},
-    {'name':'30分内','value':{'data':'1800','tyep':'normal'}},
-    {'name':'1小时内','value':{'data':'3600','tyep':'normal'}},
-    {'name':'3小时内','value':{'data':'10800','tyep':'normal'}},
-    {'name':'1秒后','value':{'data':'1','tyep':'defer'}},
-    {'name':'5秒后','value':{'data':'5','tyep':'defer'}},
-    {'name':'30秒后','value':{'data':'30','tyep':'defer'}},
-    {'name':'1分后','value':{'data':'60','tyep':'defer'}},
-    {'name':'5分后','value':{'data':'300','tyep':'defer'}},
-    {'name':'30分后','value':{'data':'1800','tyep':'defer'}},
-    {'name':'1小时后','value':{'data':'3600','tyep':'defer'}},
-    {'name':'3小时后','value':{'data':'10800','tyep':'defer'}}
+    {'name':'立即','value':{'value':'0','type':'normal'}},
+    {'name':'1秒内','value':{'value':'1','type':'normal'}},
+    {'name':'5秒内','value':{'value':'5','type':'normal'}},
+    {'name':'30秒内','value':{'value':'30','type':'normal'}},
+    {'name':'1分内','value':{'value':'60','type':'normal'}},
+    {'name':'5分内','value':{'value':'300','type':'normal'}},
+    {'name':'30分内','value':{'value':'1800','type':'normal'}},
+    {'name':'1小时内','value':{'value':'3600','type':'normal'}},
+    {'name':'3小时内','value':{'value':'10800','type':'normal'}},
+    {'name':'1秒后','value':{'value':'1','type':'defer'}},
+    {'name':'5秒后','value':{'value':'5','type':'defer'}},
+    {'name':'30秒后','value':{'value':'30','type':'defer'}},
+    {'name':'1分后','value':{'value':'60','type':'defer'}},
+    {'name':'5分后','value':{'value':'300','type':'defer'}},
+    {'name':'30分后','value':{'value':'1800','type':'defer'}},
+    {'name':'1小时后','value':{'value':'3600','type':'defer'}},
+    {'name':'3小时后','value':{'value':'10800','type':'defer'}}
   ];
   $scope.startstop=[
     {'name':'0点','value':'0'},

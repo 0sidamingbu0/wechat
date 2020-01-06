@@ -987,7 +987,7 @@ router.get('/weixin/',  function(req, res, next) {
 
 });
 router.get('/',  function(req, res, next) {
-	res.send('welcome xx的平方开根号！ 京ICP备17063732号');
+	res.send('欢迎大家，完善中<center><a href=\"http://beian.miit.gov.cn/\">京ICP备17063732号</a></center>');
 
 });
 router.use('/', wechat(config, function(req, res, next) {
