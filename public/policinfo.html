@@ -475,7 +475,7 @@ $scope.goto = function(name){
   $scope.addAdvanceEventList=function(x){
       console.log('polic:'+$scope.polic);
       //var temp = {"type":"advanceAction"}
-      $scope.polic.do[x].advanceEvent.event.push({'type':'device'});
+      $scope.polic.do[x].advanceEvent.event.push({'type':'advancePolic'});
   }  
 
   $scope.addAdvanceEventListTime=function(x){
@@ -495,7 +495,7 @@ $scope.goto = function(name){
   }
 	$scope.addaction=function(){
 		console.log('polic'+$scope.polic);
-		$scope.polic.do.push({});
+		$scope.polic.do.push({'type':'device'});
 	}
   $scope.addadvanceAction=function(){
       console.log('polic:'+$scope.polic);
