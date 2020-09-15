@@ -57,7 +57,7 @@ exports.execPolic = function(mac,event){
                         //var uid = getuserbydevice(mac);
                         gatewayService.sendmsgbydevice(mac,polic[0].do[count-1].action);
                         //gatewayService.sendmsg(getuserbydevice(mac),polic[0].do[count-1].action);
-                    }else if(polic[0].do[count-1].type=="advanceAction"){
+                    }else if(polic[0].do[count-1].type=="advanceAction-屏蔽"){
                         var doit = true;
                         for(var i=0;i<polic[0].do[count-1].event.length;i++){
                             switch(polic[0].do[count-1].advanceEvent.event[i].type){

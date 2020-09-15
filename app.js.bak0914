@@ -21,41 +21,6 @@ var Promise = require("bluebird");
 var gatewayService=require('./service/gatewayService');
 
 
-
-//20200914log增加时间
-require('date-utils');
-console.log=(function() {
-      var orig = console.log;
-      return function() {
-        try {
-          var tmp=process.stdout;
-          process.stdout=process.stderr;
-          // get now
-          var now = new Date();
-          // format time
-          var now_formated = now.toFormat("YYYY-MM-DD HH24:MI:SS");
-          var strDate = '[' + now_formated + '] ';
-          if (Buffer.isBuffer(arguments[0])) {
-            arguments[0] = strDate + arguments[0];
-          } else if (typeof arguments[0] !== 'object') {
-            arguments[0] = strDate + arguments[0];
-          } else if (typeof arguments[0] === 'object') {
-            arguments[0] = strDate + JSON.stringify(arguments[0]);
-          }
-          orig.apply(console, arguments);
-        } finally {
-          process.stdout=tmp;
-        }
-    };
-})();
-
-
-
-
-
-
-
-
 mq.mqinit();
 
 
